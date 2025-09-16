@@ -1,0 +1,140 @@
+{
+  "dacs": [
+    {
+      "id": "275e49c6-5b35-4940-a77f-0c787235cdee",
+      "creationDate": "2025-07-04T07:39:50.178971796Z",
+      "members": [],
+      "status": "active",
+      "name": "Test Dac FHDportal",
+      "description": "A test DAC to help FHDportal integration."
+    }
+  ],
+  "policies": [
+    {
+      "id": "547cfaa1-d441-48f3-b556-0bce33abaf9e",
+      "title": "Test Policy FHD",
+      "description": "A policy to test integration with FHD portal",
+      "url": "/policies/create",
+      "dacID": "275e49c6-5b35-4940-a77f-0c787235cdee",
+      "type": "open"
+    }
+  ],
+  "submissions": [
+    {
+      "datasetID": "9d6439b3-20a9-4b01-b903-b5f9910e9c83",
+      "id": "891dd02c-e834-4ab9-93bd-55d4d2af0e5b",
+      "policyID": "547cfaa1-d441-48f3-b556-0bce33abaf9e"
+    }
+  ],
+  "daa-form": {
+    "daa": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "description": "APPLICATION FOR DATA ACCESS (to be completed by the Requester) Application for access to Dataset shall be submitted to the DAC which will consider the application according to the information received.",
+        "properties": {
+          "dac": {
+            "description": "Details of DAC managing the dataset.",
+            "properties": {
+              "id": {
+                "title": "DAC ID",
+                "type": "string"
+              },
+              "name": {
+                "title": "DAC name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "title": "DAC Information",
+            "type": "object"
+          },
+          "data_requester": {
+            "description": "Name of data requester including affiliation and contact details.",
+            "properties": {
+              "address": {
+                "title": "Address",
+                "type": "string"
+              },
+              "email": {
+                "format": "email",
+                "title": "Email",
+                "type": "string"
+              },
+              "institution": {
+                "title": "Institution",
+                "type": "string"
+              },
+              "name": {
+                "title": "Full Name",
+                "type": "string"
+              },
+              "phone": {
+                "title": "Phone Number",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "institution",
+              "email"
+            ],
+            "title": "Applicant Information",
+            "type": "object"
+          },
+          "dataset": {
+            "description": "Details of Dataset requested: Description of the specific Datasets that are being requested.",
+            "properties": {
+              "accession_number": {
+                "title": "Accession Number",
+                "type": "string"
+              },
+              "description": {
+                "title": "Dataset Description",
+                "type": "string"
+              }
+            },
+            "required": [
+              "ega_study",
+              "accession_number"
+            ],
+            "title": "Dataset Information",
+            "type": "object"
+          },
+          "purpose_project": {
+            "description": "Brief abstract of the purpose and the project in which the data will be used. This should include specific details about the use of the data in the Project (500 words max).",
+            "properties": {
+              "abstract": {
+                "maxLength": 2500,
+                "title": "Project Abstract",
+                "type": "string"
+              },
+              "purpose": {
+                "title": "Purpose",
+                "type": "string"
+              }
+            },
+            "required": [
+              "purpose",
+              "abstract"
+            ],
+            "title": "Purpose and Project",
+            "type": "object"
+          }
+        },
+        "required": [
+          "dac",
+          "data_requester",
+          "dataset",
+          "purpose_project",
+          "declaration"
+        ],
+        "title": "Data Access Agreement Form",
+        "type": "object"
+      },
+      "uiSchema": {}
+    }
+  }
+}

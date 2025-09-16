@@ -1,0 +1,67 @@
+# In all environments, the following files are loaded if they exist,
+# the latter taking precedence over the former:
+#
+#  * .env                contains default values for the environment variables needed by the app
+#  * .env.local          uncommitted file with local overrides
+#  * .env.$APP_ENV       committed environment-specific defaults
+#  * .env.$APP_ENV.local uncommitted environment-specific overrides
+#
+# Real environment variables win over .env files.
+#
+# DO NOT DEFINE PRODUCTION SECRETS IN THIS FILE NOR IN ANY OTHER COMMITTED FILES.
+# https://symfony.com/doc/current/configuration/secrets.html
+#
+# Run "composer dump-env prod" to compile .env files for production use (requires symfony/flex >=1.2).
+# https://symfony.com/doc/current/best_practices.html#use-environment-variables-for-infrastructure-configuration
+
+APP_ENV=prod
+APP_DEBUG=false
+APP_SECRET=e697dae5f09768b303b30e66696cd03d
+
+VITE_FEGA_COUNTRY_NAME="Switzerland"
+VITE_FEGA_COUNTRY_ADJECTIVE="Swiss"
+
+
+
+POSTGRES_HOST=db
+POSTGRES_DB=fhd-portal
+POSTGRES_USER=fhd-user
+POSTGRES_PASSWORD='X9c5AL2TssiDLHk'
+POSTGRES_MULTIPLE_DATABASES="fega,keycloak"
+
+# Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
+DATABASE_URL="postgresql://postgres@db:5432/fega?serverVersion=16&charset=utf8"
+
+JWT_PUBLIC_KEY='tralala'
+JWT_ALGORITHM=RS256
+JWT_LEEWAY=60
+###> nelmio/cors-bundle ###
+CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+###< nelmio/cors-bundle ###
+
+VITE_APP_URL="localhost:8022"
+VITE_API_URL="/api/"
+
+
+KC_DB="postgres"
+KC_DB_URL_HOST=$POSTGRES_HOST
+KC_DB_URL_DATABASE="keycloak"
+KC_DB_PASSWORD=$POSTGRES_PASSWORD
+KC_DB_USERNAME=$POSTGRES_USER
+KC_DB_SCHEMA="public"
+KC_BOOTSTRAP_ADMIN_USERNAME="admin"
+KC_BOOTSTRAP_ADMIN_PASSWORD="password"
+
+
+KEYCLOAK_REALM="fhdportal"
+VITE_KEYCLOAK_URL='http://0.0.0.0:8080'
+VITE_KEYCLOAK_CLIENT_ID="fhdportal-sp"
+KEYCLOAK_URL="keycloak:8080"
+KEYCLOAK_CLIENT_ID="fhdportal-cli"
+KEYCLOAK_SECRET=CPRY895ZjwO1AF3f03IndoqTicmHrRjy
+
+SDA_INBOX="/var/www/fhd-portal/sda"
+
+SYMFONY_TRUSTED_HEADERS="X-Forwarded-Prefix"
+
+DAC_API="http://dac-api:3000"

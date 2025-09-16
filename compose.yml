@@ -1,0 +1,105 @@
+services:
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.webserver
+      # no_cache: true
+      args:
+        - VITE_APP_URL=${VITE_APP_URL}
+        - VITE_API_URL=${VITE_API_URL}
+        - VITE_KEYCLOAK_REALM=${KEYCLOAK_REALM}
+        - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
+        - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
+        - GITHUB_URL=https://github.com/rliechti/fhdportal-app
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+      - "5174:443"
+    env_file:
+      - .env
+    depends_on:
+      - api
+    volumes:
+      - ./logs:/logs
+    networks:
+      - web-db-net
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        - GITHUB_URL=https://github.com/rliechti/fhdportal-api
+    ports:
+      - "8082:80"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/usr/local/log
+      - .:/api
+      - ./sda:/var/www/fhd-portal/sda
+    depends_on:
+      - db
+    networks:
+      - web-db-net
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.database
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+    healthcheck:
+      test: "exit 0"
+    volumes:
+      - ./fhd-db-data:/var/lib/postgresql/data:rw
+    networks:
+      - web-db-net
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_PASSWORD: X9c5AL2TssiDLHk
+      KC_DB_USERNAME: fhd-user
+      KC_DB_SCHEMA: public
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/fhdportal-realm.json
+    volumes:
+      - ./init/fhdportal-realm.json:/opt/keycloak/data/import/fhdportal-realm.json
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - web-db-net
+  mailhog:
+      container_name: mailhog
+      image: mailhog/mailhog
+      ports:
+        - 1025:1025
+        - 8025:8025
+      networks:
+        - web-db-net
+  dac-api:
+    build:
+        context: .
+        dockerfile: Dockerfile.dacapi
+    volumes:
+      - ./dac-data/db.json:/app/db.json
+      - ./dac-data/public:/public:delegated
+    ports:
+      - 3000:3000
+    networks:
+      - web-db-net
+    restart: unless-stopped
+volumes:
+  fhd-db-data:
+    name: fhd-db-data
+networks:
+  web-db-net:
+    driver: bridge

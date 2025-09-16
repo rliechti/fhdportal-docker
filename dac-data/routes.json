@@ -1,0 +1,5 @@
+{
+  "/*": "/$1",
+  "/policies/:id/daa-form": "/daa-form",
+  "/policies/:id/dga-form": "/dga-form"
+}

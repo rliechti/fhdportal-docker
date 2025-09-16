@@ -1,0 +1,2 @@
+* * * * * /usr/local/bin/php /var/www/fhd-portal/htdocs/api/tools/cron_sda.php >> /usr/local/log/cron.log 2>&1
+* * * * * /usr/local/bin/php /var/www/fhd-portal/htdocs/api/tools/cron_publish.php >> /usr/local/log/cron.log 2>&1

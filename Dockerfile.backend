@@ -1,0 +1,93 @@
+# Using php image as base
+FROM php:8.4-fpm
+
+## inject all environment vars we'll need
+ARG GITHUB_URL
+
+
+#update and upgrade
+RUN apt update && apt upgrade -y
+
+RUN apt install -y git \
+        vim \
+        unzip \
+				golang \
+        libzip-dev \
+        libpq-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libwebp-dev \
+        libfreetype6-dev \
+				sendmail \
+				cron
+
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install pdo pdo_pgsql pgsql sockets zip gd
+
+COPY conf/fpm-pool.conf $PHP_INI_DIR/php-fpm.d/www.conf
+
+RUN go install github.com/mailhog/mhsendmail@latest
+RUN mv $HOME/go/bin/mhsendmail /usr/local/bin/mhsendmail
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+RUN sed -i 's/^max_execution_time = .*/max_execution_time = 300/' $PHP_INI_DIR/php.ini
+RUN sed -i 's/^max_input_time = .*/max_input_time = 300/' $PHP_INI_DIR/php.ini
+RUN sed -i 's/^memory_limit = .*/memory_limit = 512M/' $PHP_INI_DIR/php.ini
+RUN sed -i 's/^post_max_size = .*/post_max_size = 1G/' $PHP_INI_DIR/php.ini
+RUN sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 1G/' $PHP_INI_DIR/php.ini
+RUN echo "sendmail_path = '/usr/local/bin/mhsendmail --smtp-addr=\"mailhog:1025\"'" >> $PHP_INI_DIR/php.ini
+
+RUN mkdir -p /logs && chown -R www-data:www-data /logs
+
+# Install Composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');"
+
+# Add fhd-portal source code
+RUN mkdir -p /var/www/fhd-portal/htdocs/api
+WORKDIR /var/www/fhd-portal/htdocs/api
+
+# Add fhd-portal source code
+
+ADD $GITHUB_URL/commits/main /version.json
+RUN git clone $GITHUB_URL.git .
+RUN rm -rf .git
+
+RUN mkdir -p /var/www/fhd-portal/htdocs/api/data && chmod -R 777 /var/www/fhd-portal/htdocs/api/data
+RUN mkdir -p /var/www/fhd-portal/htdocs/api/tmp && chmod -R 777 /var/www/fhd-portal/htdocs/api/tmp
+RUN mkdir -p /var/www/fhd-portal/htdocs/api/log && chmod -R 777 /var/www/fhd-portal/htdocs/api/log
+
+# Install fhd-portal PHP dependencies
+WORKDIR /var/www/fhd-portal/htdocs/api
+COPY .env /var/www/fhd-portal/htdocs/api/.env
+RUN echo $COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+
+WORKDIR /var/www/fhd-portal/htdocs/api/tools
+RUN echo $COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+
+# Copy fake sda script
+COPY init/cron_sda.php /var/www/fhd-portal/htdocs/api/tools/cron_sda.php
+COPY init/cron_publish.php /var/www/fhd-portal/htdocs/api/tools/cron_publish.php
+
+# Copy cron job file to cron.d
+COPY init/sdacron /etc/cron.d/sdacron
+
+# Give permission and apply cron job
+RUN chmod 0644 /etc/cron.d/sdacron \
+    && crontab /etc/cron.d/sdacron
+
+# Create log file
+RUN mkdir -p /usr/local/log
+RUN touch /usr/local/log/cron.log
+
+# Copy the entrypoint script into the image and make it executable
+WORKDIR /var/www/fhd-portal/htdocs/api
+COPY init/entrypoint_backenddev.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Use the entrypoint script to initialize the container
+ENTRYPOINT ["entrypoint.sh"]
