@@ -48,11 +48,11 @@ docker-compose up --build -d
 
 ### Register and Setup Roles
 
-1. Navigate to the **Submitter Portal**.![figure1](/Users/rliechti/Desktop/doc/assets/figure1.png)
-2. Click the **Register** link at the bottom of the page.![figure2](/Users/rliechti/Desktop/doc/assets/figure2.png)
-3. Complete the registration form. (You may leave `SSH Public Key` and `C4GH Public Key` empty initially.)![figure3](/Users/rliechti/Desktop/doc/assets/figure3.png)
+1. Navigate to the **Submitter Portal**.![figure1](assets/figure1.png)
+2. Click the **Register** link at the bottom of the page.![figure2](assets/figure2.png)
+3. Complete the registration form. (You may leave `SSH Public Key` and `C4GH Public Key` empty initially.)![figure3](assets/figure3.png)
 4. After registering, request the **Submitter Role** by clicking the corresponding button. A green confirmation message will appear.
-5. *(In production mode)* This request sends an email to the FEGA helpdesk. This demonstrator uses [MailHog](http://localhost:8025) as a fake mail server for testing. Check the inbox at [http://localhost:8025](http://localhost:8025).![figure4](/Users/rliechti/Desktop/doc/assets/figure4.png)
+5. *(In production mode)* This request sends an email to the FEGA helpdesk. This demonstrator uses [MailHog](http://localhost:8025) as a fake mail server for testing. Check the inbox at [http://localhost:8025](http://localhost:8025).![figure4](assets/figure4.png)
 
 ### Admin Setup for Role Management
 
@@ -62,16 +62,16 @@ docker-compose up --build -d
         - Username: `admin`
         - Password: `password`
 7. In Keycloak:
-    - Select **Manage Realms** then click on **fhdportal**.![figure5](/Users/rliechti/Desktop/doc/assets/figure5.png)
-    - Go to **Users** and select your username.![figure6](/Users/rliechti/Desktop/doc/assets/figure6.png)
-    - Go to **Role Mapping**, click **Assign Role** → **Realm Roles**, choose **admin-fega**, and click **Assign**.![figure7](/Users/rliechti/Desktop/doc/assets/figure7.png)
+    - Select **Manage Realms** then click on **fhdportal**.![figure5](assets/figure5.png)
+    - Go to **Users** and select your username.![figure6](assets/figure6.png)
+    - Go to **Role Mapping**, click **Assign Role** → **Realm Roles**, choose **admin-fega**, and click **Assign**.![figure7](assets/figure7.png)
 8. Return to the FHDportal ([http://localhost:5173](http://localhost:5173)) and reload the page.
-9. You should now see an **Admin** → **Users** menu. Use it to toggle the **Submitter** role for your user. ![figure8](/Users/rliechti/Desktop/doc/assets/figure8.png)
+9. You should now see an **Admin** → **Users** menu. Use it to toggle the **Submitter** role for your user. ![figure8](assets/figure8.png)
 
 ### SSH Key Registration
 
 10. Return to the **Submitter Portal** and reload the page.
-11. Register your SSH public key. (*Note: SSH keys are not used in this demonstrator but are required in production for Secure Data Archive authentication.*)![figure9](/Users/rliechti/Desktop/doc/assets/figure9.png)
+11. Register your SSH public key. (*Note: SSH keys are not used in this demonstrator but are required in production for Secure Data Archive authentication.*)![figure9](assets/figure9.png)
 12. Reload the page to reveal the submission button.
 13. Click **Submit a New Study** to start your dataset submission.
 
@@ -103,7 +103,7 @@ cp ../../fhdportal-example/RCC/files/*.c4gh .
 
 15. Click on **Large Submissions in Batch**.
 16. Upload the example bundle `RCC.zip`.
-17. After validation, click **Close**.![figure10](/Users/rliechti/Desktop/doc/assets/figure10.png)
+17. After validation, click **Close**.![figure10](assets/figure10.png)
 18. Explore your submission across the tabs: **Study, Samples, Experiments, Runs, Analyses, Datasets**.
 
 ***
