@@ -126,7 +126,7 @@ foreach($messages as $msg){
                 "id" => null,
                 "properties" => json_encode($properties),
                 "resource_type_id" => DB::queryFirstField("SELECT id from resource_type where name = 'SdaFile'"),
-                "status_type_id" => DB::queryFirstField("SELECT id from status_type where name = 'draft'")
+                "status_type_id" => DB::queryFirstField("SELECT id from status_type where name = 'published'")
             );
             $action_type_id = 'CRE';
             $checksums = array();
