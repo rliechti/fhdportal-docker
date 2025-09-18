@@ -10,6 +10,8 @@ services:
         - VITE_KEYCLOAK_REALM=${KEYCLOAK_REALM}
         - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
         - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
+        - VITE_FEGA_COUNTRY_NAME=${VITE_FEGA_COUNTRY_NAME}
+        - VITE_FEGA_COUNTRY_ADJECTIVE=${VITE_FEGA_COUNTRY_ADJECTIVE}
         - GITHUB_URL=https://github.com/rliechti/fhdportal-app
     restart: unless-stopped
     ports:
