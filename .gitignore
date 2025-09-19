@@ -16,7 +16,6 @@ tools/local_version
 /.env.local
 /.env.local.php
 /.env.*.local
-.env
 
 # Transient files
 /var/

@@ -20,13 +20,7 @@ git clone git@github.com:rliechti/fhdportal-docker.git
 cd fhdportal-docker
 ```
 
-2. **Create a symbolic link for the environment file:**
-
-```bash
-ln -s env .env
-```
-
-3. **Build and start the Docker containers:**
+2. **Build and start the Docker containers:**
 To run in the foreground:
 
 ```bash
@@ -39,7 +33,7 @@ To run in the background (detached mode):
 docker-compose up --build -d
 ```
 
-4. **Open the portal in your browser:**
+3. **Open the portal in your browser:**
 [http://localhost:5173](http://localhost:5173)
 
 ***
