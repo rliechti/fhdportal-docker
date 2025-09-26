@@ -71,14 +71,14 @@ docker-compose up --build -d
 
 ***
 
-## Importing Encrypted Files into Secure Data Archive (SDA)
+## Importing Encrypted Files into Secure Data Archive (SDA-Inbox)
 
-14. In this demonstrator, encrypted files (*.c4gh) must be manually copied into subdirectories within the `sda` directory.
+14. In this demonstrator, encrypted files (*.c4gh) must be manually copied into subdirectories within the `sda-inbox` directory.
 
 15. Create an inbox directory named after your registered email:
 
 ```bash
-cd sda
+cd sda-inbox
 mkdir your.email@example.com
 ```
 
