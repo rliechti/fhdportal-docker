@@ -3,6 +3,7 @@ FROM php:8.4-fpm
 
 ## inject all environment vars we'll need
 ARG GITHUB_URL
+ARG API_GITHUB_URL
 
 
 #update and upgrade
@@ -51,7 +52,8 @@ WORKDIR /var/www/fhd-portal/htdocs/api
 
 # Add fhd-portal source code
 
-ADD $GITHUB_URL/commits/main /version.json
+# ADD $GITHUB_URL/commits/main /version.json
+RUN curl -sSL $API_GITHUB_URL/commits/main > /version.json
 RUN git clone $GITHUB_URL.git .
 RUN rm -rf .git
 

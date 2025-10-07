@@ -13,6 +13,7 @@ services:
         - VITE_FEGA_COUNTRY_NAME=${VITE_FEGA_COUNTRY_NAME}
         - VITE_FEGA_COUNTRY_ADJECTIVE=${VITE_FEGA_COUNTRY_ADJECTIVE}
         - GITHUB_URL=https://github.com/rliechti/fhdportal-app
+        - API_GITHUB_URL=https://api.github.com/repos/rliechti/fhdportal-app
     restart: unless-stopped
     ports:
       - "5173:80"
@@ -31,6 +32,7 @@ services:
       dockerfile: Dockerfile.backend
       args:
         - GITHUB_URL=https://github.com/rliechti/fhdportal-api
+        - API_GITHUB_URL=https://api.github.com/repos/rliechti/fhdportal-api
     ports:
       - "8082:80"
     env_file:

@@ -11,6 +11,7 @@ ARG VITE_KEYCLOAK_CLIENT_ID
 ARG VITE_FEGA_COUNTRY_NAME
 ARG VITE_FEGA_COUNTRY_ADJECTIVE
 ARG GITHUB_URL
+ARG API_GITHUB_URL
 # expose the variable to the finished container
 ENV VITE_APP_URL=$VITE_APP_URL
 ENV VITE_API_URL=$VITE_API_URL
@@ -35,7 +36,7 @@ WORKDIR /app
 
 # Add fhdportal-app source code
 
-ADD $GITHUB_URL/commits/main /version.json
+RUN curl -sSL $API_GITHUB_URL/commits/main > /version.json
 RUN git clone $GITHUB_URL.git .
 ## Install project dependencies
 RUN npm install
