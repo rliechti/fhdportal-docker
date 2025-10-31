@@ -40,7 +40,7 @@ services:
     volumes:
       - ./logs:/usr/local/log
       - .:/api
-      - ./sda-inbox:/var/www/fhd-portal/sda-inbox
+      - ./sda-inbox:/var/www/fhd-portal/sda
     depends_on:
       - db
     networks:
