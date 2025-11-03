@@ -61,7 +61,7 @@ services:
       - web-db-net
   keycloak:
     image: quay.io/keycloak/keycloak
-    command: start-dev --import-realm
+    command: start-dev  --https-certificate-file=/certs/cert.pem --https-certificate-key-file=/certs/key.pem --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: db
@@ -74,8 +74,11 @@ services:
       KEYCLOAK_IMPORT: /tmp/fhdportal-realm.json
     volumes:
       - ./init/fhdportal-realm.json:/opt/keycloak/data/import/fhdportal-realm.json
+      - ./certs/cert.pem:/certs/cert.pem 
+      - ./certs/cert-key.pem:/certs/key.pem
     ports:
       - 8080:8080
+      - 8443:8443
     depends_on:
       db:
         condition: service_healthy
