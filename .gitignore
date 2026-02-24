@@ -1,8 +1,9 @@
 
 ### Project ###
 
-# FAKE SDA
-/sda/*
+# Docker Container Data
+/fhd-db-data/
+/sda-inbox/
 
 # Dependencies
 /vendor/
