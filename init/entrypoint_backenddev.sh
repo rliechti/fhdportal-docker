@@ -1,12 +1,21 @@
 #!/bin/bash
+set -e
 
 # Navigate to the application directory (adjust this path as needed)
 cd /var/www/fhd-portal/htdocs/api
 
 # Run Composer install (or update)
-echo $COMPOSER_ALLOW_SUPERUSER=1
+echo "$COMPOSER_ALLOW_SUPERUSER"=1
 composer install --no-interaction --no-plugins --no-scripts --prefer-dist
 composer require symfony/runtime
+
+# Download the latest schemas using the CLI tool
+if [ -f "bin/fega.phar" ]; then
+    echo "Running 'bin/fega.phar update' to download the latest schemas..."
+    php bin/fega.phar update || echo "Warning: 'fega.phar update' failed"
+else
+    echo "Warning: 'bin/fega.phar' not found, skipping schema update"
+fi
 
 # Start PHP-FPM
 touch /usr/local/log/php_fpm_www-error_log

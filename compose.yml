@@ -33,6 +33,7 @@ services:
       args:
         - GITHUB_URL=https://github.com/rliechti/fhdportal-api
         - API_GITHUB_URL=https://api.github.com/repos/rliechti/fhdportal-api
+        - FEGA_SCHEMA_DIR=${FEGA_SCHEMA_DIR:-/var/www/fhd-portal/htdocs/api/data/schemas}
     ports:
       - "8082:80"
     env_file:

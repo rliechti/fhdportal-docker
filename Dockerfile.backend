@@ -4,6 +4,8 @@ FROM php:8.4-fpm
 ## inject all environment vars we'll need
 ARG GITHUB_URL
 ARG API_GITHUB_URL
+ARG FEGA_SCHEMA_DIR
+ENV FEGA_SCHEMA_DIR=${FEGA_SCHEMA_DIR:-/var/www/fhd-portal/htdocs/api/data/schemas}
 
 
 #update and upgrade
@@ -57,6 +59,11 @@ RUN curl -sSL $API_GITHUB_URL/commits/main > /version.json
 RUN git clone $GITHUB_URL.git .
 RUN rm -rf .git
 
+# Create a schema store and ensure proper permissions
+RUN mkdir -p /var/www/fhd-portal/htdocs/api/data/schemas \
+    && chown -R www-data:www-data /var/www/fhd-portal/htdocs/api/data/schemas \
+    && chmod -R 755 /var/www/fhd-portal/htdocs/api/data/schemas
+
 RUN mkdir -p /var/www/fhd-portal/htdocs/api/data && chmod -R 777 /var/www/fhd-portal/htdocs/api/data
 RUN mkdir -p /var/www/fhd-portal/htdocs/api/tmp && chmod -R 777 /var/www/fhd-portal/htdocs/api/tmp
 RUN mkdir -p /var/www/fhd-portal/htdocs/api/log && chmod -R 777 /var/www/fhd-portal/htdocs/api/log
@@ -65,11 +72,10 @@ RUN mkdir -p /var/www/fhd-portal/htdocs/api/log && chmod -R 777 /var/www/fhd-por
 WORKDIR /var/www/fhd-portal/htdocs/api
 COPY .env /var/www/fhd-portal/htdocs/api/.env
 RUN echo $COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist --ignore-platform-req=ext-gd
 
-WORKDIR /var/www/fhd-portal/htdocs/api/tools
-RUN echo $COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+# Ensure the bin directory is executable
+RUN if [ -d "bin" ]; then chmod -R 755 bin; fi
 
 # Copy fake sda script
 COPY init/cron_sda.php /var/www/fhd-portal/htdocs/api/tools/cron_sda.php
