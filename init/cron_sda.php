@@ -59,7 +59,7 @@ foreach($dirs as $dir){
 	$current_files = array();
 	foreach($list as $f){
 		$sha =  hash_file('sha256', $dir."/".$f);
-		$current_files[$sha] = $f;
+		$current_files[$f] = $sha;
 		if (isset($previous_files[$sha]) && $previous_files[$sha] != $f){
 			$messages[] = array(
 				"operation" => "rename",
@@ -83,7 +83,7 @@ foreach($dirs as $dir){
 		}
 	}
 	$content = array();
-	foreach($current_files as $sha => $f){
+	foreach($current_files as $f => $sha){
 		$content[] = $f.":".$sha;
 	}
 
@@ -146,12 +146,11 @@ foreach($messages as $msg){
                     INNER JOIN resource_type ON resource.resource_type_id = resource_type.id
                     AND resource_type.\"name\" = 'SdaFile'
                     inner join resource_acl on resource.id = resource_acl.resource_id and resource_acl.user_id = %i
-                where coalesce(resource.properties->'encrypted_checksums'->>'value'::text,'') in %ls
+                where coalesce(resource.properties->'encrypted_checksums'->0->>'value','') in %ls
                 ", $user_id, $checksums);
             }
             if ($dbresource && $dbresource['filepath'] == $msg['filepath']) {
-                fwrite(STDERR, "Already exists".PHP_EOL);
-                return;
+                continue;
             } elseif ($dbresource) { //UPDATE (RENAME)
                 // TODO RENAME
                 $resource['id'] = $dbresource['id'];
