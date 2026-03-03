@@ -1489,18 +1489,8 @@ INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_ty
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (17, 18, 1, 7, true) ON CONFLICT DO NOTHING;
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (7, 7, 1, 2, true) ON CONFLICT DO NOTHING;
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (8, 11, 1, 2, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (25, 21, 1, 12, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (23, 21, 1, 13, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (24, 21, 1, 2, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (22, 20, 1, 13, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (20, 20, 1, 19, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (21, 20, 1, 2, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (19, 19, 1, 13, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (18, 19, 1, 12, true) ON CONFLICT DO NOTHING;
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (10, 9, 1, 11, true) ON CONFLICT DO NOTHING;
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (26, 9, 1, 7, true) ON CONFLICT DO NOTHING;
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (11, 12, 1, 7, true) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (36, 22, 3, 3, false) ON CONFLICT DO NOTHING;
-INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (37, 22, 1, 13, true) ON CONFLICT DO NOTHING;
 
 -- End of dump
