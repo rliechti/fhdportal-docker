@@ -1254,7 +1254,7 @@ ALTER TABLE ONLY public.relationship
 --
 
 ALTER TABLE ONLY public.relationship
-    ADD CONSTRAINT "relationship_status_type_id_fkey" FOREIGN KEY ("status_type_id") REFERENCES "public"."status_type"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    ADD CONSTRAINT relationship_status_type_id_fkey FOREIGN KEY (status_type_id) REFERENCES public.status_type(id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 
 --
