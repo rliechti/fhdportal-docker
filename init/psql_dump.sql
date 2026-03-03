@@ -596,19 +596,6 @@ CREATE TABLE public.relationship_log (
 );
 
 
---
--- Name: relationship_old; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.relationship_old (
-    id uuid,
-    relationship_rule_id integer,
-    domain_resource_id uuid,
-    predicate_id integer,
-    range_resource_id uuid,
-    sequence_number integer,
-    is_active boolean
-);
 
 
 --
@@ -623,17 +610,6 @@ CREATE TABLE public.relationship_rule (
     default_is_active boolean DEFAULT true
 );
 
-
---
--- Name: relationship_rule_old; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.relationship_rule_old (
-    id integer,
-    domain_type_id integer,
-    predicate_id integer,
-    range_type_id integer
-);
 
 
 --
@@ -679,31 +655,6 @@ CREATE VIEW public.relationship_view AS
      JOIN public.resource_type range_types ON ((ranges.resource_type_id = range_types.id)))
      JOIN public.predicate ON ((relationship_rule.predicate_id = predicate.id)));
 
-
---
--- Name: resource_20251120; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.resource_20251120 (
-    id uuid,
-    properties jsonb,
-    resource_type_id integer,
-    status_type_id text
-);
-
-
---
--- Name: resource_type_old; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.resource_type_old (
-    id integer NOT NULL,
-    prefix text NOT NULL,
-    name text NOT NULL,
-    properties jsonb,
-    public_id_prefix text,
-    validator_mandatory boolean DEFAULT true
-);
 
 
 --
@@ -1127,13 +1078,6 @@ ALTER TABLE ONLY public.resource
     ADD CONSTRAINT resource_pkey PRIMARY KEY (id);
 
 
---
--- Name: resource_type_old resource_type_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_type_old
-    ADD CONSTRAINT resource_type_pkey PRIMARY KEY (id);
-
 
 --
 -- Name: resource_type resource_type_pkey1; Type: CONSTRAINT; Schema: public; Owner: -
@@ -1392,13 +1336,6 @@ ALTER TABLE ONLY public.resource
 ALTER TABLE ONLY public.resource_type
     ADD CONSTRAINT resource_type_prefix_fkey FOREIGN KEY (prefix) REFERENCES public.namespace(prefix) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
-
---
--- Name: resource_type_old resource_type_prefix_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.resource_type_old
-    ADD CONSTRAINT resource_type_prefix_fkey FOREIGN KEY (prefix) REFERENCES public.namespace(prefix) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
