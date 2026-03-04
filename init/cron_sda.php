@@ -55,7 +55,7 @@ foreach($dirs as $dir){
 	}
 
 
-	$list = array_filter(scandir($dir),function($f){return substr($f,0,1)!= '.';});
+	$list = array_filter(scandir($dir),function($f){return substr($f,0,1)!= '.' && strtolower(pathinfo($f, PATHINFO_EXTENSION)) === 'c4gh' ;});
 	$current_files = array();
 	foreach($list as $f){
 		$sha =  hash_file('sha256', $dir."/".$f);

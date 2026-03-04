@@ -119,3 +119,17 @@ cp ../../fhdportal-example/RCC/files/*.c4gh .
 
 24. Go to **Catalogue** → **Studies/Cohorts** to find your submission listed.![figure11](assets/figure11.png)
 25. Click your submission to view detailed information.![figure12](assets/figure12.png)
+
+## Access request
+
+While ideally, the access request is managed by a Data Access Committee portal, a minimal access request is available as a demonstrator.
+
+26. Click on **Request Access...** 
+    ![figure13](assets/figure13.png)
+
+27. Fill in the form. Provide a C4GH public key. It will be stored in the Keycloak account of the user. Click on **Send Request**
+    ![figure14](assets/figure14.png)
+28. An email in sent to a DAC email address. Navigate to http://localhost:8025
+    ![image-20260304142512066](assets/figure15.png)
+29. As administrator of FHDportal, click on **ADMIN -> Dataset Requests** at the bottom of the left navigation menu. All requests are listed and can be **approved** or **rejected**. 
+    ![image-20260304142826680](assets/figure16.png)
