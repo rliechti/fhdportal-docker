@@ -637,23 +637,28 @@ CREATE VIEW public.relationship_rule_view AS
 --
 
 CREATE VIEW public.relationship_view AS
- SELECT relationship.id,
-    relationship.domain_resource_id,
-    (domains.properties ->> 'public_id'::text) AS domain_public_id,
-    domain_types.name AS domain_type,
-    predicate.name AS predicate_name,
-    relationship.range_resource_id,
-    (ranges.properties ->> 'public_id'::text) AS range_public_id,
-    range_types.name AS range_type,
-    relationship.is_active,
-    relationship_rule.id AS relationship_rule_id
-   FROM ((((((public.relationship
-     JOIN public.resource domains ON ((relationship.domain_resource_id = domains.id)))
-     JOIN public.resource ranges ON ((relationship.range_resource_id = ranges.id)))
-     JOIN public.relationship_rule ON ((relationship.relationship_rule_id = relationship_rule.id)))
-     JOIN public.resource_type domain_types ON ((domains.resource_type_id = domain_types.id)))
-     JOIN public.resource_type range_types ON ((ranges.resource_type_id = range_types.id)))
-     JOIN public.predicate ON ((relationship_rule.predicate_id = predicate.id)));
+SELECT relationship.id,
+   relationship.domain_resource_id,
+   string_agg(DISTINCT domains.properties ->> 'public_id'::text, ','::text) AS domain_public_id,
+   string_agg(DISTINCT domain_types.name, ','::text) AS domain_type,
+   string_agg(DISTINCT predicate.name, ','::text) AS predicate_name,
+   relationship.range_resource_id,
+   string_agg(DISTINCT ranges.properties ->> 'public_id'::text, ','::text) AS range_public_id,
+   string_agg(DISTINCT range_types.name, ','::text) AS range_type,
+   relationship.is_active,
+   min(DISTINCT relationship_rule.id) AS relationship_rule_id,
+   min(relationship_log.action_time) AS creation_date,
+   relationship.status_type_id
+  FROM public.relationship
+    LEFT JOIN public.relationship_log ON relationship_log.relationship_id = relationship.id
+    JOIN public.resource domains ON relationship.domain_resource_id = domains.id
+    JOIN public.resource ranges ON relationship.range_resource_id = ranges.id
+    JOIN public.relationship_rule ON relationship.relationship_rule_id = relationship_rule.id
+    JOIN public.resource_type domain_types ON domains.resource_type_id = domain_types.id
+    JOIN public.resource_type range_types ON ranges.resource_type_id = range_types.id
+    JOIN public.predicate ON relationship_rule.predicate_id = predicate.id
+ WHERE COALESCE(public.relationship.status_type_id, ''::text) <> 'DEL'::text
+ GROUP BY public.relationship.id, public.relationship.domain_resource_id, (domains.properties ->> 'public_id'::text), domain_types.name, predicate.name, public.relationship.range_resource_id, (ranges.properties ->> 'public_id'::text), range_types.name, relationship.is_active, relationship_rule.id, relationship.status_type_id;
 
 
 
