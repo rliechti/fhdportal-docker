@@ -1500,3 +1500,67 @@ INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_ty
 INSERT INTO public.relationship_rule (id, domain_type_id, predicate_id, range_type_id, default_is_active) VALUES (11, 12, 1, 7, true) ON CONFLICT DO NOTHING;
 
 -- End of dump
+
+-- Update the 'Dataset' UI schema
+UPDATE resource_type
+SET properties = jsonb_set(
+    jsonb_set(
+        jsonb_set(
+            (properties #- '{data_schema,properties,dataset_types,x-check}')
+            #- '{data_schema,properties,dataset_types,uniqueItems}',
+            '{data_schema,properties,molecularrun_public_ids,x-compact}',
+            'true'::jsonb
+        ),
+        '{data_schema,properties,molecularanalysis_public_ids,x-compact}',
+        'true'::jsonb
+    ),
+    '{ui_schema}',
+    '{
+        "type": "group",
+        "elements": [{
+            "type": "VerticalLayout",
+            "elements": [
+                {
+                    "type": "HorizontalLayout",
+                    "elements": [
+                        {
+                            "type": "VerticalLayout",
+                            "elements": [
+                                {
+                                    "rule": {"effect": "SHOW", "condition": {"scope": "#", "schema": {"required": ["public_id"], "properties": {"public_id": {"type": "string"}}}}},
+                                    "type": "Control",
+                                    "label": "FEGA Dataset ID",
+                                    "scope": "#/properties/public_id",
+                                    "options": {"readonly": true}
+                                },
+                                {"type": "Control", "label": "Title", "scope": "#/properties/title"},
+                                {"type": "Control", "label": "Description", "scope": "#/properties/description", "options": {"multi": true}},
+                                {"type": "Control", "label": "Release Date", "scope": "#/properties/released_date", "options": {"format": "date", "dateFormat": "DD.MM.YYYY", "dateSaveFormat": "YYYY-MM-DD"}}
+                            ]
+                        },
+                        {
+                            "type": "VerticalLayout",
+                            "elements": [
+                                {"type": "Control", "label": "Dataset Types", "scope": "#/properties/dataset_types"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "HorizontalLayout",
+                    "elements": [
+                        {"type": "Control", "scope": "#/properties/extra_attributes"}
+                    ]
+                },
+                {
+                    "type": "HorizontalLayout",
+                    "elements": [
+                        {"type": "Control", "label": "Molecular Run", "scope": "#/properties/molecularrun_public_ids"},
+                        {"type": "Control", "label": "Molecular Analysis", "scope": "#/properties/molecularanalysis_public_ids"}
+                    ]
+                }
+            ]
+        }]
+    }'::jsonb
+)
+WHERE id = 2;
