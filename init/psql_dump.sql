@@ -1438,6 +1438,7 @@ INSERT INTO public.status_type (id, name, class_name) VALUES ('REV', 'revised', 
 INSERT INTO public.status_type (id, name, class_name) VALUES ('SUB', 'submitted', 'light-green') ON CONFLICT DO NOTHING;
 INSERT INTO public.status_type (id, name, class_name) VALUES ('APR', 'approved', 'green') ON CONFLICT DO NOTHING;
 INSERT INTO public.status_type (id, name, class_name) VALUES ('REJ', 'rejected', 'red') ON CONFLICT DO NOTHING;
+INSERT INTO public.status_type (id, name, class_name) VALUES ('RES', 're-submitted', 'light-green') ON CONFLICT DO NOTHING;
 
 -- predicate
 INSERT INTO public.predicate (id, prefix, name, properties) VALUES (1, 'fega', 'isPartOf', NULL) ON CONFLICT DO NOTHING;
