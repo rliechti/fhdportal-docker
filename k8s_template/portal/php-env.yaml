@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: php-env
+  namespace: fhd-portal
+type: Opaque
+data:
+  .env: |
+    POSTGRES_HOST=db
+    POSTGRES_DB=fhd-portal
+    POSTGRES_USER=fhd-user
+    POSTGRES_PASSWORD='X9c5AL2TssiDLHk'
+    POSTGRES_MULTIPLE_DATABASES="fega,keycloak"
+    POSTGRES_PORT=5432
+
+    APP_ENV=prod
+    APP_DEBUG=false
+    APP_SECRET=032623a32b1a514e488625471dfef9bba775f879c0b142c5d48d1680ffac7d47
+
+    DAC_API="http://dac-api:3000"
+    NO_REPLY_EMAIL=<NO_REPLY_EMAIL>
+    HELPDESK_EMAIL=<HELPDESK_EMAIL>
+    GOS_DAC_EMAIL=<DAC_EMAIL>
+
+    DATABASE_URL="postgresql://postgres@db:5432/fega?serverVersion=16&charset=utf8"
+    KEYCLOAK_URL="keycloak:8080"
+    KEYCLOAK_REALM="fhdportal"
+    KEYCLOAK_CLIENT_ID="fhdportal-cli"
+    KEYCLOAK_SECRET=CPRY895ZjwO1AF3f03IndoqTicmHrRjy
+
+    CORS_ALLOW_ORIGIN=''
+    #CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+
+    MAILER_DSN='smtp://mailhog:1025'
+
+    SHELL_VERBOSITY=0
+    FEGA_SCHEMA_DIR='/var/www/fhd-portal/htdocs/api/data/schemas'
+    
+    SDA_INBOX="/var/www/fhd-portal/sda"

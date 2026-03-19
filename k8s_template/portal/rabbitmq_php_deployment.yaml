@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbit-php
+  namespace: fhd-portal
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rabbit-php
+  template:
+    metadata:
+      labels:
+        app: rabbit-php
+    spec:
+      serviceAccountName: rabbit-php-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+        fsGroupChangePolicy: "OnRootMismatch"
+        seccompProfile:
+          type: RuntimeDefault
+        supplementalGroups: [33]
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: rabbitmq-php
+          image: <IMAGE_PLACEHOLDER>
+          command: ["php"]
+          args: ["/var/www/fhd-portal/htdocs/api/tools/fetch_rabbitmq.php"]
+          volumeMounts:
+            - name: config-php-env
+              mountPath: /var/www/fhd-portal/htdocs/api/.env
+              subPath: .env
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            limits:
+              cpu: "50m"
+              memory: 50Mi
+            requests:
+              cpu: "50m"
+              memory: 50Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: config-php-env
+          secret:
+            secretName: php-env
