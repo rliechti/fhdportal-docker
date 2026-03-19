@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: initdb-grant-script
+  namespace: psql-cluster
+data:
+  grant_privileges.sql: |
+    DO $$
+    DECLARE
+        r RECORD;
+    BEGIN
+        FOR r IN SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+        LOOP
+            EXECUTE format('ALTER TABLE public.%I OWNER TO "fhd-portal";', r.tablename);
+        END LOOP;
+    END $$;
+
+    DO $$
+    DECLARE
+        r RECORD;
+    BEGIN
+        FOR r IN SELECT table_name FROM information_schema.views WHERE table_schema = 'public'
+        LOOP
+            EXECUTE format('ALTER VIEW public.%I OWNER TO "fhd-portal";', r.table_name);
+        END LOOP;
+    END $$;
+
+    GRANT ALL PRIVILEGES ON DATABASE "fhd-portal" TO "fhd-portal";
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "fhd-portal";
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "fhd-portal";
+    GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO "fhd-portal";
+    
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON TABLES TO "fhd-portal";
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON SEQUENCES TO "fhd-portal";
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON FUNCTIONS TO "fhd-portal";

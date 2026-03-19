@@ -1,0 +1,66 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: psql-cluster
+  namespace: psql-cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+   
+  description: "FHD portal Generated Cluster"
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.3
+  instances: 2
+  startDelay: 10
+  stopDelay: 10
+  primaryUpdateStrategy: unsupervised
+  replicationSlots:
+    highAvailability:
+      enabled: true
+  postgresql:
+    syncReplicaElectionConstraint:
+      enabled: true
+      nodeLabelsAntiAffinity:
+        - topology.kubernetes.io/zone
+  bootstrap:
+    initdb:
+      database: fhd-portal
+      owner: fhd-portal
+      secret:
+        name: app-user-login
+      postInitApplicationSQLRefs:
+        configMapRefs:
+        - name: initdb-sql-script
+          key: psql_dump.sql
+        - name: initdb-grant-script
+          key: grant_privileges.sql
+  superuserSecret:
+    name: app-superuser-login
+
+  enableSuperuserAccess: true
+
+  storage:
+    pvcTemplate:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: <storage-class-name>
+        volumeMode: Filesystem
+  walStorage:
+    pvcTemplate:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: <storage-class-name>
+  monitoring:
+    enablePodMonitor: true
