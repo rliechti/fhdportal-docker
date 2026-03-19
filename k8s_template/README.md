@@ -1,6 +1,6 @@
 # FHDportal Deployment Guide
 
-FHDportal is the Federated Human Data Portal developed by SIB Swiss Institute of Bioinformatics for federated human genomic and metadata management. These are partial extracts from our production deployment at SIB—provided for inspiration only. [sib](https://www.sib.swiss)
+FHDportal is the Federated Human Data Portal developed by SIB Swiss Institute of Bioinformatics for federated human genomic and metadata management. These are partial extracts from our production deployment at SIB—provided for inspiration only.
 
 ## ⚠️ Important Disclaimer
 
