@@ -1400,11 +1400,14 @@ ALTER TABLE ONLY public.user_key_log
 -- Essential reference data
 
 -- action_type
+INSERT INTO public.action_type (id, name) VALUES ('APR', 'approve') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('CRE', 'create') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('DEL', 'delete') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('MOD', 'modify') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('PUB', 'publish') ON CONFLICT DO NOTHING;
-INSERT INTO public.action_type (id, name) VALUES ('VER', 'verified') ON CONFLICT DO NOTHING;
+INSERT INTO public.action_type (id, name) VALUES ('REV', 'revise') ON CONFLICT DO NOTHING;
+INSERT INTO public.action_type (id, name) VALUES ('VER', 'verify') ON CONFLICT DO NOTHING;
+
 
 -- namespace
 INSERT INTO public.namespace (prefix, uri, name) VALUES ('ega', 'https://ega-archive.org/', 'European Genome-phenome Archive') ON CONFLICT DO NOTHING;
