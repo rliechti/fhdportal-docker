@@ -24,16 +24,24 @@ data:
 
     DATABASE_URL="postgresql://postgres@db:5432/fega?serverVersion=16&charset=utf8"
     KEYCLOAK_URL="keycloak:8080"
+    # Set this to whatever public-facing URL browsers use to reach Keycloak
+    # in this cluster if it differs from KEYCLOAK_URL above (e.g. an Ingress
+    # hostname vs. the internal service name) - defaults to KEYCLOAK_URL if
+    # omitted, which is correct only when both are reachable via the same URL.
+    #KEYCLOAK_ISSUER_URL="https://<public-keycloak-hostname>"
     KEYCLOAK_REALM="fhdportal"
     KEYCLOAK_CLIENT_ID="fhdportal-cli"
     KEYCLOAK_SECRET=CPRY895ZjwO1AF3f03IndoqTicmHrRjy
+    KEYCLOAK_DAC_CLIENT_ID="dac-cli"
+    KEYCLOAK_DAC_SECRET=oCxOwyIWWv8KUGjiZX4ForecFiO5YG6w
 
-    CORS_ALLOW_ORIGIN=''
-    #CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+    CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
 
     MAILER_DSN='smtp://mailhog:1025'
 
     SHELL_VERBOSITY=0
     FEGA_SCHEMA_DIR='/var/www/fhd-portal/htdocs/api/data/schemas'
-    
+
     SDA_INBOX="/var/www/fhd-portal/sda"
+
+    RABBITMQ_ENABLED=false

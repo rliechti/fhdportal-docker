@@ -1,0 +1,11 @@
+{
+  "data": [
+    {
+      "id": "f3a00e9c-0565-40ca-94da-0a21b2840169",
+      "dacID": "3ca06160-2000-40ce-b906-4a796375de61",
+      "title": "Standard Data Access Policy",
+      "description": "Mock policy for local development."
+    }
+  ],
+  "pagination": { "totalCount": 1, "offset": 0, "limit": 1 }
+}

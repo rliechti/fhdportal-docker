@@ -1,0 +1,7 @@
+{
+  "name": "Test DAC",
+  "description": "Mock Data Access Committee for local development.",
+  "members": [
+    { "userID": "0da28851-fe45-4fe4-8c88-86a99218711c", "email": "dac-member@example.org" }
+  ]
+}
