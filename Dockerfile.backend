@@ -59,9 +59,10 @@ RUN curl -sSL $API_GITHUB_URL/commits/main > /version.json
 RUN git clone $GITHUB_URL.git .
 RUN rm -rf .git
 
-# Create a schema store and ensure proper permissions
-RUN mkdir -p /var/www/fhd-portal/htdocs/api/data/schemas \
-    && chown -R www-data:www-data /var/www/fhd-portal/htdocs/api/data/schemas \
+# Create a schema store
+RUN mkdir -p /var/www/fhd-portal/htdocs/api/data/schemas
+COPY init/schemas/ /var/www/fhd-portal/htdocs/api/data/schemas/
+RUN chown -R www-data:www-data /var/www/fhd-portal/htdocs/api/data/schemas \
     && chmod -R 755 /var/www/fhd-portal/htdocs/api/data/schemas
 
 RUN mkdir -p /var/www/fhd-portal/htdocs/api/data && chmod -R 777 /var/www/fhd-portal/htdocs/api/data
