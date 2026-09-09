@@ -1,0 +1,267 @@
+{
+    "type": "object",
+    "title": "Dataset",
+    "x-cega": {
+        "schema": {
+            "foreignKeys": [
+                {
+                    "fields": [
+                        "title"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "title"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "description"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "description"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "dataset_types"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "dataset_types"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "policy_id"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "policy_accession_id"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "molecularrun_public_ids"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "run_provisional_ids"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "molecularanalysis_public_ids"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "analysis_provisional_ids"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "extra_attributes"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "extra_attributes"
+                        ],
+                        "resource": "datasets"
+                    }
+                }
+            ]
+        }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+        "title",
+        "description",
+        "dataset_types",
+        "molecularrun_public_ids",
+        "released_date"
+    ],
+    "properties": {
+        "title": {
+            "type": "string"
+        },
+        "policy_id": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "format": "uuid"
+        },
+        "public_id": {
+            "type": "string",
+            "pattern": "^CHFEGAD[0-9]{11}"
+        },
+        "description": {
+            "type": "string"
+        },
+        "dataset_types": {
+            "type": "array",
+            "items": {
+                "enum": [
+                    "Whole genome sequencing",
+                    "Exome sequencing",
+                    "Genotyping by array",
+                    "Transcriptome profiling by high-throughput sequencing",
+                    "Transcriptome profiling by array",
+                    "Amplicon sequencing",
+                    "Methylation binding domain sequencing",
+                    "Methylation profiling by high-throughput sequencing",
+                    "Phenotype information",
+                    "Study summary information",
+                    "Genomic variant calling",
+                    "Chromatin accessibility profiling by high-throughput sequencing",
+                    "Histone modification profiling by high-throughput sequencing",
+                    "Chip-Seq"
+                ],
+                "type": "string"
+            }
+        },
+        "released_date": {
+            "type": "string",
+            "format": "date"
+        },
+        "extra_attributes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "tag",
+                    "value",
+                    "unit"
+                ],
+                "properties": {
+                    "tag": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": [
+                            "string",
+                            "integer",
+                            "number"
+                        ]
+                    }
+                }
+            }
+        },
+        "policy_public_id": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "pattern": "^CHFEGAP[0-9]{11}",
+            "x-check": "Policy",
+            "description": "Data Access Policy Public ID",
+            "x-check_title": "title",
+            "x-check_value": "public_id"
+        },
+        "molecularrun_public_ids": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^CHFEGAR[0-9]{11}"
+            },
+            "x-check": "MolecularRun",
+            "x-compact": true,
+            "uniqueItems": true,
+            "x-check_title": "title",
+            "x-check_value": "public_id"
+        },
+        "molecularanalysis_public_ids": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^CHFEGAZ[0-9]{11}"
+            },
+            "x-check": "MolecularAnalysis",
+            "x-compact": true,
+            "uniqueItems": true,
+            "x-check_title": "title",
+            "x-check_value": "public_id"
+        }
+    },
+    "x-resource": {
+        "schema": {
+            "fields": [
+                {
+                    "name": "title",
+                    "constraints": {
+                        "required": true
+                    }
+                },
+                {
+                    "name": "description",
+                    "constraints": {
+                        "required": true
+                    }
+                },
+                {
+                    "name": "dataset_types",
+                    "type": "list",
+                    "constraints": {
+                        "required": true
+                    }
+                },
+                {
+                    "name": "runs",
+                    "type": "list"
+                },
+                {
+                    "name": "analyses",
+                    "type": "list"
+                },
+                {
+                    "name": "released_date",
+                    "constraints": {
+                        "required": true
+                    }
+                }
+            ],
+            "primaryKey": [
+                "title"
+            ],
+            "foreignKeys": [
+                {
+                    "fields": [
+                        "runs"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "title"
+                        ],
+                        "resource": "MolecularRun"
+                    }
+                },
+                {
+                    "fields": [
+                        "analyses"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "title"
+                        ],
+                        "resource": "MolecularAnalysis"
+                    }
+                }
+            ]
+        }
+    }
+}

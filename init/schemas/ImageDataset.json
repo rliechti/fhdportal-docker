@@ -1,0 +1,260 @@
+{
+    "type": "object",
+    "title": "Dataset",
+    "x-cega": {
+        "schema": {
+            "foreignKeys": [
+                {
+                    "fields": [
+                        "title"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "title"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "description"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "description"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "dataset_types"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "dataset_types"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "policy_id"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "policy_accession_id"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "run_public_ids"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "run_provisional_ids"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "analysis_public_ids"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "analysis_provisional_ids"
+                        ],
+                        "resource": "datasets"
+                    }
+                },
+                {
+                    "fields": [
+                        "extra_attributes"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "extra_attributes"
+                        ],
+                        "resource": "datasets"
+                    }
+                }
+            ]
+        }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "required": [
+        "title",
+        "description",
+        "dataset_types",
+        "run_public_ids",
+        "released_date"
+    ],
+    "properties": {
+        "title": {
+            "type": "string"
+        },
+        "policy_id": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "format": "uuid"
+        },
+        "public_id": {
+            "type": "string",
+            "pattern": "^CHFEGAD[0-9]{11}"
+        },
+        "description": {
+            "type": "string"
+        },
+        "dataset_types": {
+            "type": "array",
+            "items": {
+                "enum": [
+                    "Digital pathology",
+                    "Expansion microscopy",
+                    "Localisation markers",
+                    "Force microscopy",
+                    "Histology",
+                    "Interferometric microscopy",
+                    "Intravital imaging",
+                    "Light field microscopy",
+                    "Mass spectrometry imaging",
+                    "Environmental transmission electron microscopy",
+                    "Point detection microscopy",
+                    "Sample material separation",
+                    "Diffractometry and scattering",
+                    "Label-free imaging"
+                ],
+                "type": "string"
+            },
+            "x-check": "verticalcheckbox",
+            "uniqueItems": true
+        },
+        "released_date": {
+            "type": "string",
+            "format": "date"
+        },
+        "run_public_ids": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^CHFEGAR[0-9]{11}"
+            },
+            "x-check": "ImageRuns",
+            "uniqueItems": true
+        },
+        "extra_attributes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "tag",
+                    "value",
+                    "unit"
+                ],
+                "properties": {
+                    "tag": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": [
+                            "string",
+                            "integer",
+                            "number"
+                        ]
+                    }
+                }
+            }
+        },
+        "policy_public_id": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "pattern": "^CHFEGAP[0-9]{11}",
+            "x-check": "Policy",
+            "description": "Data Access Policy Public ID",
+            "x-check_title": "title",
+            "x-check_value": "public_id"
+        },
+        "analysis_public_ids": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^CHFEGAZ[0-9]{11}"
+            },
+            "x-check": "ImageAnalysis",
+            "uniqueItems": true,
+            "x-check_title": "title",
+            "x-check_value": "public_id"
+        }
+    },
+    "x-resource": {
+        "schema": {
+            "fields": [
+                {
+                    "name": "title",
+                    "constraints": {
+                        "required": true
+                    }
+                },
+                {
+                    "name": "description",
+                    "constraints": {
+                        "required": true
+                    }
+                },
+                {
+                    "name": "dataset_types",
+                    "type": "list",
+                    "constraints": {
+                        "required": true
+                    }
+                },
+                {
+                    "name": "runs",
+                    "type": "list"
+                },
+                {
+                    "name": "analyses",
+                    "type": "list"
+                }
+            ],
+            "primaryKey": [
+                "title"
+            ],
+            "foreignKeys": [
+                {
+                    "type": "list",
+                    "fields": [
+                        "runs"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "title"
+                        ],
+                        "resource": "ImageRun"
+                    }
+                },
+                {
+                    "fields": [
+                        "analyses"
+                    ],
+                    "reference": {
+                        "fields": [
+                            "title"
+                        ],
+                        "resource": "ImageAnalysis"
+                    }
+                }
+            ]
+        }
+    }
+}
