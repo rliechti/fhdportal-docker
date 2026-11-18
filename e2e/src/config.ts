@@ -108,6 +108,8 @@ export function cfg() {
         filesTimeoutMs: minutes('E2E_FILES_TIMEOUT_MIN', 4),
         publishTimeoutMs: minutes('E2E_PUBLISH_TIMEOUT_MIN', 4),
         catalogueTimeoutMs: minutes('E2E_CATALOGUE_TIMEOUT_MIN', 2),
+        // Beacon keeps its model of the published datasets for 5 minutes
+        beaconTimeoutMs: minutes('E2E_BEACON_TIMEOUT_MIN', 6),
         pollIntervalMs: Number(get('E2E_POLL_INTERVAL_MS') ?? 5_000)
     }
 }

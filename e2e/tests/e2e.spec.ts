@@ -350,19 +350,36 @@ test.describe('Phase 6: catalogue and Beacon', () => {
     })
 
     test('6.3 Beacon lists the published dataset (needs a build that has Beacon)', async () => {
+        test.setTimeout(cfg().beaconTimeoutMs + 60_000)
         const info = await fetch(`${cfg().apiUrl}/beacon/info`)
         test.skip(info.status === 404, 'this API build has no Beacon (the image is built from the default branch of fhdportal-api)')
         expect(info.status).toBe(200)
+
+        // The Beacon keeps its model of the published datasets for 5 minutes (BeaconRepository::CACHE_SECONDS): a dataset published
+        // a moment ago shows up within that time. Drop the model when the API container can be reached, else wait for it.
+        if (cfg().triggerCron) {
+            console.log(`6.3 beacon cache: ${await runInApiContainer(['php', 'bin/console', 'cache:pool:delete', 'cache.app', 'beacon_model_v1'])}`)
+        }
         const id = publicId(S.dataset)
         // public: no token
-        const res = await fetch(`${cfg().apiUrl}/beacon/datasets/${id}`)
-        expect(res.status).toBe(200)
-        const body: any = await res.json()
+        const body: any = await poll(
+            'published dataset in the Beacon',
+            async () => {
+                const res = await fetch(`${cfg().apiUrl}/beacon/datasets/${id}`)
+                if (res.status !== 200) throw new Error(`GET /beacon/datasets/${id} -> HTTP ${res.status}`)
+                const answer: any = await res.json()
+                return answer.responseSummary?.exists
+                    ? { done: true as const, value: answer }
+                    : { done: false as const, note: `not listed yet: ${JSON.stringify(answer.responseSummary)}` }
+            },
+            { timeoutMs: cfg().beaconTimeoutMs, intervalMs: 10_000 }
+        )
         await attach('beacon-dataset.json', body)
         expect(JSON.stringify(body)).toContain(id)
         // a dataset that does not exist answers with an empty result set, not an error
         const none = await fetch(`${cfg().apiUrl}/beacon/datasets/CHFEGAD99999999999`)
         expect(none.status).toBe(200)
+        expect(((await none.json()) as any).responseSummary?.exists).toBe(false)
     })
 })
 

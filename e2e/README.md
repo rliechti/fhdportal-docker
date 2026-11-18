@@ -36,7 +36,7 @@ Every run leaves a study and its published datasets in the demonstrator, named `
 | 3 Bundle upload and editing | uploads the zip, edits the study and a sample, deletes a sample (on a scratch study), reads every resource type, checks that the study is private | |
 | 4 Policy and submission | health check, policy of the mock DAC portal, submit | |
 | 5 Publication | waits until both datasets and the study are published | no DAC decision on a submission: a cron job publishes what is submitted once its release date has come |
-| 6 Catalogue and Beacon | dataset in the catalogue, its page lists its files, Beacon (skipped when the image has none) | |
+| 6 Catalogue and Beacon | dataset in the catalogue, its page lists its files, Beacon (skipped when the image has none) | Beacon caches its model for 5 minutes: the test drops it, or waits for it (up to 6 minutes) without docker |
 | 7 Access request | opens a request, sends the form, downloads and uploads the DAA, **the DAC approves, then revokes** | the mock DAC portal never decides: the test sends the decision with the token of the `dac-cli` client, as the real DAC portal does |
 
 Steps 3.6 and 7.2b check that a study and an access request belong to their owner, and 7.4 that neither the submitter nor the help desk can decide a request. Not covered: the dataset download (needs
