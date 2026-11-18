@@ -842,6 +842,42 @@
       ],
       "protocolMappers": [
         {
+          "id": "4cc935ad-8930-4c63-ab3d-2929c5765bc7",
+          "name": "c4gh-public-key",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "true",
+            "user.attribute": "c4gh-public-key",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "c4gh-public-key",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "5f48a7c6-fd43-4cd0-b80b-36ef9966f958",
+          "name": "ssh-public-key",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "true",
+            "user.attribute": "ssh-public-key",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "ssh-public-key",
+            "jsonType.label": "String"
+          }
+        },
+        {
           "id": "6775ccb8-3e87-4662-af61-efed625be3e8",
           "name": "fhdportal-api-audience",
           "protocol": "openid-connect",
@@ -1169,6 +1205,22 @@
         "offline_access",
         "organization",
         "microprofile-jwt"
+      ],
+      "protocolMappers": [
+        {
+          "id": "607772df-f6b0-4297-a61b-d21e1038f58c",
+          "name": "fhdportal-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "fhdportal-cli",
+            "id.token.claim": "false",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
       ]
     }
   ],
