@@ -1406,6 +1406,7 @@ INSERT INTO public.action_type (id, name) VALUES ('DEL', 'delete') ON CONFLICT D
 INSERT INTO public.action_type (id, name) VALUES ('MOD', 'modify') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('PUB', 'publish') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('REV', 'revise') ON CONFLICT DO NOTHING;
+INSERT INTO public.action_type (id, name) VALUES ('SUB', 'submit') ON CONFLICT DO NOTHING;
 INSERT INTO public.action_type (id, name) VALUES ('VER', 'verify') ON CONFLICT DO NOTHING;
 
 
