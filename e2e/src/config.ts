@@ -106,7 +106,7 @@ export function cfg() {
         requestAccepted: list('E2E_REQUEST_ACCEPTED', 'APR,approved').map((s) => s.toLowerCase()),
         requestFormOverrides: get('E2E_REQUEST_FORM_JSON'),
         filesTimeoutMs: minutes('E2E_FILES_TIMEOUT_MIN', 4),
-        publishTimeoutMs: minutes('E2E_PUBLISH_TIMEOUT_MIN', 4),
+        approvalTimeoutMs: minutes('E2E_APPROVAL_TIMEOUT_MIN', 4),
         catalogueTimeoutMs: minutes('E2E_CATALOGUE_TIMEOUT_MIN', 2),
         // Beacon keeps its model of the published datasets for 5 minutes
         beaconTimeoutMs: minutes('E2E_BEACON_TIMEOUT_MIN', 6),

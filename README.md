@@ -106,32 +106,33 @@ cp ../../fhdportal-example/RCC/files/*.c4gh .
 
 19. On the **Datasets** tab, associate a **Policy** for each dataset:
     - Click the **POLICY** button.
-    - Select **Test Policy FHD** and click **Set Policy**.
+    - Select **Standard Data Access Policy** and click **Set Policy**.
     *(Note: In FEGA production, a separate DAC portal handles Policies. Here, a fake REST API serves this function.)*
 20. Once policies are set for all datasets, a **Submit Study...** button will appear.
 21. Click it to submit and confirm your study.
-22. Submission approval occurs automatically within one minute (production mode uses DAC portal for approval).
-23. Reload the page; the dataset status should update to **published**.
+22. Within one minute the submitted datasets (and the study) become **approved**: a cron job plays the DAC portal here. In production the DAC portal approves.
+23. Publication is done by an FHDportal administrator (role `admin-fega`, see the first steps). Open **Admin → Dataset Reviews** ("Dataset Publication Review"), click **approve...** on each dataset and then **confirm publication**.
+24. Reload the page; the dataset status should update to **published**.
 
 ***
 
 ## Viewing Submissions
 
-24. Go to **Catalogue** → **Studies/Cohorts** to find your submission listed.![figure11](assets/figure11.png)
-25. Click your submission to view detailed information.![figure12](assets/figure12.png)
+25. Go to **Catalogue** → **Studies/Cohorts** to find your submission listed.![figure11](assets/figure11.png)
+26. Click your submission to view detailed information.![figure12](assets/figure12.png)
 
 ## Access request
 
 While ideally, the access request is managed by a Data Access Committee portal, a minimal access request is available as a demonstrator.
 
-26. Click on **Request Access...** 
+27. Click on **Request Access...** 
     ![figure13](assets/figure13.png)
 
-27. Fill in the form. Provide a C4GH public key. It will be stored in the Keycloak account of the user, not in this form. Click on **Send Request**
+28. Fill in the form. Provide a C4GH public key. It will be stored in the Keycloak account of the user, not in this form. Click on **Send Request**
     ![figure14](assets/figure14.png)
-28. An email in sent to a DAC email address. Navigate to http://localhost:8025
+29. An email in sent to a DAC email address. Navigate to http://localhost:8025
     ![image-20260304142512066](assets/figure15.png)
-29. As administrator of FHDportal, click on **ADMIN -> Dataset Requests** at the bottom of the left navigation menu. All requests are listed here, showing their current status.
+30. As administrator of FHDportal, click on **ADMIN -> Dataset Requests** at the bottom of the left navigation menu. All requests are listed here, showing their current status.
 
     *(Note: request approval/rejection is no longer performed from this admin page. In production, the real DAC portal reviews and approves/rejects requests itself, by calling back into FHDportal with its own service credential. This demonstrator's `dac-api` container is a stateless mock of that external DAC portal — it returns canned sample responses so the submission/request-creation flow can be exercised end-to-end, but it does not call back to approve anything, so requests here will stay in a "submitted" state rather than transitioning to "approved". To try that endpoint directly, obtain a token for the `dac-cli` Keycloak client via a client-credentials grant and call `PATCH /api/requests/{id}` with `{"request_status": "APR"}`.)*
     ![image-20260304142826680](assets/figure16.png)

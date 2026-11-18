@@ -81,7 +81,7 @@ RUN if [ -d "bin" ]; then chmod -R 755 bin; fi
 
 # Copy fake sda script
 COPY init/cron_sda.php /var/www/fhd-portal/htdocs/api/tools/cron_sda.php
-COPY init/cron_publish.php /var/www/fhd-portal/htdocs/api/tools/cron_publish.php
+COPY init/cron_approve.php /var/www/fhd-portal/htdocs/api/tools/cron_approve.php
 
 # Copy cron job file to cron.d
 COPY init/sdacron /etc/cron.d/sdacron

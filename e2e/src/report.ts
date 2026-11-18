@@ -31,7 +31,7 @@ export const GROUPS: Array<{ label: string; match: RegExp }> = [
     { label: '2 Uploaded files (fake SDA)', match: /^2\./ },
     { label: '3 Bundle upload and editing', match: /^3\./ },
     { label: '4 Policy and submission', match: /^4\./ },
-    { label: '5 Publication', match: /^5\./ },
+    { label: '5 Approval and publication', match: /^5\./ },
     { label: '6 Catalogue and Beacon', match: /^6\./ },
     { label: '7 Access request and DAC decision', match: /^7\./ }
 ]

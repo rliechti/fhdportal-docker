@@ -53,7 +53,7 @@ const isAccepted = (r: any) => cfg().requestAccepted.includes(requestStatus(r).t
 const requestsFor = (all: any[], dataset: any) => all.filter((r) => [dataset.id, dataset.public_id].some((k) => k && JSON.stringify(r).includes(k)))
 
 // Asks the cron jobs of the API container to run now (they run every minute anyway)
-async function cron(job: 'cron_sda' | 'cron_publish'): Promise<void> {
+async function cron(job: 'cron_sda' | 'cron_approve'): Promise<void> {
     if (!cfg().triggerCron) return
     const result = await runInApiContainer(['php', `tools/${job}.php`])
     console.log(`${job}: ${result}`)
@@ -299,26 +299,59 @@ test.describe('Phase 4: policy and submission', () => {
     })
 })
 
-test.describe('Phase 5: publication', () => {
-    // There is no DAC decision on a submission here: the cron job publishes the submitted datasets whose release date
-    // (today, in the generated bundle) has come, together with their study.
-    test('5.1 both datasets are published', async () => {
-        test.setTimeout(cfg().publishTimeoutMs + 60_000)
+test.describe('Phase 5: approval and publication', () => {
+    const isStatus = (d: any, id: string, name: string) => [d.status_type_id, d.status].some((s) => [id.toLowerCase(), name.toLowerCase()].includes(String(s).toLowerCase()))
+    // The review list of the help desk ("Dataset Publication Review"); /datasets is the public catalogue.
+    const mine = async () => asList(await api.get('HELPDESK', '/admin/datasets')).filter((d) => d.study_public_id === studyId() || d.study_id === studyId())
+
+    // There is no DAC portal here: a cron job of the API container (init/cron_approve.php) plays it, and approves what is submitted.
+    // It never publishes: that is up to an administrator of FHDportal (5.4).
+    test('5.1 the cron job plays the DAC portal: both datasets and the study are approved', async () => {
+        test.setTimeout(cfg().approvalTimeoutMs + 60_000)
         await poll(
-            'both datasets published',
+            'both datasets and the study approved',
             async () => {
-                await cron('cron_publish')
+                await cron('cron_approve')
                 const datasets = await study('datasets')
                 const states = datasets.map((d) => d.status_type_id ?? d.status)
-                return datasets.length === 2 && states.every((s) => String(s).toUpperCase() === 'PUB' || String(s).toLowerCase() === 'published')
+                const studyStatus = (await api.get('SUBMITTER', `/submissions/${studyId()}`)).status_type_id
+                return datasets.length === 2 && states.every((s) => String(s).toUpperCase() === 'APR') && studyStatus === 'APR'
                     ? { done: true as const, value: states }
-                    : { done: false as const, note: `status = ${JSON.stringify(states)}` }
+                    : { done: false as const, note: `datasets ${JSON.stringify(states)}, study ${studyStatus}` }
             },
-            { timeoutMs: cfg().publishTimeoutMs, intervalMs: cfg().pollIntervalMs }
+            { timeoutMs: cfg().approvalTimeoutMs, intervalMs: cfg().pollIntervalMs }
         )
     })
 
-    test('5.2 the study is published too', async () => {
+    test('5.2 an approved dataset is not published, and the submitter cannot publish it', async () => {
+        for (const d of await study('datasets')) expect(d.status_type_id, `dataset ${publicId(d)}`).toBe('APR')
+        // nobody is published yet: the catalogue does not list them
+        const catalogue = asList(await api.get('SUBMITTER', '/datasets'))
+        for (const d of await study('datasets')) expect(catalogue.some((c) => c.public_id === publicId(d)), `${publicId(d)} is in the catalogue`).toBe(false)
+
+        // the decision to publish is the help desk's
+        const [first] = await study('datasets')
+        const res = await api.raw('SUBMITTER', 'PATCH', `/submissions/${studyId()}/datasets/${publicId(first)}`, { json: { status_type_id: 'PUB' } })
+        const after = (await study('datasets')).find((d) => publicId(d) === publicId(first))
+        expect(after.status_type_id, `the submitter published a dataset: HTTP ${res.status} ${res.text.slice(0, 120)}`).toBe('APR')
+    })
+
+    test('5.3 the help desk sees both approved datasets in the review list', async () => {
+        const datasets = await mine()
+        await attach('review-list.json', datasets.map((d: any) => ({ id: d.public_id, status: d.status, status_type_id: d.status_type_id, released_date: d.released_date })))
+        expect(datasets, 'the datasets of the study in the help desk review list').toHaveLength(2)
+        for (const d of datasets) expect(isStatus(d, 'APR', 'approved'), `dataset ${d.public_id}: ${d.status_type_id} / ${d.status}`).toBe(true)
+    })
+
+    test('5.4 the help desk publishes both datasets', async () => {
+        for (const d of await mine()) {
+            await api.patch('HELPDESK', `/submissions/${d.study_id}/datasets/${d.id}`, { status_type_id: 'PUB' })
+        }
+        const states = (await study('datasets')).map((d) => d.status_type_id)
+        expect(states, 'both datasets are published').toEqual(['PUB', 'PUB'])
+    })
+
+    test('5.5 the study is published too', async () => {
         const after = await api.get('SUBMITTER', `/submissions/${studyId()}`)
         expect(after.status_type_id).toBe('PUB')
     })

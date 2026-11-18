@@ -35,7 +35,7 @@ Every run leaves a study and its published datasets in the demonstrator, named `
 | 2 Uploaded files | the cron job of the API container registers the files, the test waits for them in "My Uploaded Files" | the cron job runs every minute (the test runs it at once) |
 | 3 Bundle upload and editing | uploads the zip, edits the study and a sample, deletes a sample (on a scratch study), reads every resource type, checks that the study is private | |
 | 4 Policy and submission | health check, policy of the mock DAC portal, submit | |
-| 5 Publication | waits until both datasets and the study are published | no DAC decision on a submission: a cron job publishes what is submitted once its release date has come |
+| 5 Approval and publication | a cron job approves both datasets and the study, the help desk sees them in the review list and publishes them | no DAC portal: a cron job of the API container plays it and approves what is submitted; publishing is the help desk's, as in production |
 | 6 Catalogue and Beacon | dataset in the catalogue, its page lists its files, Beacon (skipped when the image has none) | Beacon caches its model for 5 minutes: the test drops it, or waits for it (up to 6 minutes) without docker |
 | 7 Access request | opens a request, sends the form, downloads and uploads the DAA, **the DAC approves, then revokes** | the mock DAC portal never decides: the test sends the decision with the token of the `dac-cli` client, as the real DAC portal does |
 
@@ -64,7 +64,7 @@ bug is fixed the step passes, Playwright reports that as a failure, and the run 
   `dac-cli`, and the C4GH and SSH key mappers on `fhdportal-cli` (the user logins of the test use that client). `init/fhdportal-realm.json`
   has them. Keycloak only imports it into a **new** database: an existing one needs the mappers added by hand, or a reset.
 - `KEYCLOAK_ALLOWED_AZP` in `../.env` has to include `dac-cli`.
-- The API container mounts `../sda-inbox` and runs `tools/cron_sda.php` and `tools/cron_publish.php`.
+- The API container mounts `../sda-inbox` and runs `tools/cron_sda.php` and `tools/cron_approve.php`.
 
 ## Notes
 
