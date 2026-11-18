@@ -1,0 +1,18 @@
+{
+  "name": "fhdportal-docker-e2e",
+  "private": true,
+  "description": "API-level end-to-end test of the FHDportal demonstrator (submission, publication and access request)",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "unit": "playwright test tests/helpers.spec.ts",
+    "list": "playwright test --list",
+    "e2e": "node scripts/run.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4",
+    "dotenv": "^18.0.6",
+    "typescript": "^7.0.2"
+  }
+}
