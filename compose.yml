@@ -42,6 +42,8 @@ services:
       - ./logs:/usr/local/log
       - .:/api
       - ./sda-inbox:/var/www/fhd-portal/sda
+      # single source of configuration: the app (and its cron jobs) read this file
+      - ./.env:/var/www/fhd-portal/htdocs/api/.env:ro
     depends_on:
       - db
     networks:

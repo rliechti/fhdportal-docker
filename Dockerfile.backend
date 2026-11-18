@@ -70,7 +70,8 @@ RUN mkdir -p /var/www/fhd-portal/htdocs/api/log && chmod -R 777 /var/www/fhd-por
 
 # Install fhd-portal PHP dependencies
 WORKDIR /var/www/fhd-portal/htdocs/api
-COPY .env /var/www/fhd-portal/htdocs/api/.env
+# The configuration is not baked into the image: compose.yml mounts ./.env at
+# /var/www/fhd-portal/htdocs/api/.env at run time.
 RUN echo $COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist --ignore-platform-req=ext-gd
 
