@@ -33,7 +33,8 @@ export const GROUPS: Array<{ label: string; match: RegExp }> = [
     { label: '4 Policy and submission', match: /^4\./ },
     { label: '5 Approval and publication', match: /^5\./ },
     { label: '6 Catalogue and Beacon', match: /^6\./ },
-    { label: '7 Access request and DAC decision', match: /^7\./ }
+    { label: '7 Access request and DAC decision', match: /^7\./ },
+    { label: '8 A deleted part stays deleted', match: /^8\./ }
 ]
 
 const FAILED: StepStatus[] = ['failed', 'timedOut', 'interrupted']

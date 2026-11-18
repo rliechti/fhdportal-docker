@@ -38,6 +38,7 @@ Every run leaves a study and its published datasets in the demonstrator, named `
 | 5 Approval and publication | a cron job approves both datasets and the study, the help desk sees them in the review list and publishes them | no DAC portal: a cron job of the API container plays it and approves what is submitted; publishing is the help desk's, as in production |
 | 6 Catalogue and Beacon | dataset in the catalogue, its page lists its files, Beacon (skipped when the image has none) | Beacon caches its model for 5 minutes: the test drops it, or waits for it (up to 6 minutes) without docker |
 | 7 Access request | opens a request, sends the form, downloads and uploads the DAA, **the DAC approves, then revokes** | the mock DAC portal never decides: the test sends the decision with the token of the `dac-cli` client, as the real DAC portal does |
+| 8 A deleted part stays deleted | a second study whose second dataset is deleted is approved and published with its other dataset | |
 
 Steps 3.6 and 7.2b check that a study and an access request belong to their owner, and 7.4 that neither the submitter nor the help desk can decide a request. Not covered: the dataset download (needs
 RabbitMQ and the DOA), what the pages look like, and the DAC portal itself.
@@ -52,6 +53,8 @@ The first runs found five bugs of the API. They are fixed in `fhdportal-api`, an
 | 3.8 | an anonymous request for a study was answered with 500 | the exception listener gives a plain `Exception` with a 4xx code its status |
 | 3.9 | a user without a role got 200 with `{"error":{"status":401}}` instead of an error status | `getSubmission` answers with the status of the error, as its sibling routes do |
 | 3.10 | deleting a sample made the health check report a blocking `deleted_but_linked` error: such a study could not be submitted | only a rejected resource is reported; a deleted one is soft-deleted and ignored, and a live reference to it is caught by the cross-reference check |
+| 4.4, 5.6 | the sample deleted in 3.4 came back at the submission, and was published: a change of status of the study was written to every part of it, the deleted ones included | the cascade (`ResourceEditService::setResourceStatusById`) leaves a deleted part alone |
+| 8.1 | a study with a deleted dataset was stuck at "approved" when its other dataset was published: the study followed all its datasets, the deleted one included | the two study-level checks ignore deleted datasets |
 | 7.2, 7.2b | the owner of a new access request got 403 on the form `GET` and on the `PATCH`: the portal only knows a request after that first `PATCH`, but checked ownership before | a request the portal does not know yet may be opened; once it is known only its owner (or an administrator) passes, which 7.2b checks |
 
 For a bug that cannot be fixed at once, mark its step `test.fail(true, '<what is wrong>')`, and add a workaround to the scenario if it

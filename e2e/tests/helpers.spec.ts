@@ -183,7 +183,7 @@ test.describe('buildMarkdown', () => {
         ...extra
     })
     const meta = { tester: 'Ada', startedAt: '2026-11-18 10:00:00', target: 'http://localhost:5173/api', htmlReport: '../../html/index.html' }
-    const all = (status: StepResult['status']) => ['0.1', '1.1', '2.1', '3.1', '4.1', '5.1', '6.1', '7.1-7.2', '7.5'].map((id) => step(id, status))
+    const all = (status: StepResult['status']) => ['0.1', '1.1', '2.1', '3.1', '4.1', '5.1', '6.1', '7.1-7.2', '7.5', '8.1'].map((id) => step(id, status))
 
     test('a green run is PASSED, with the header fields and the evidence', () => {
         const md = buildMarkdown(

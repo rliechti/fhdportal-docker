@@ -297,6 +297,13 @@ test.describe('Phase 4: policy and submission', () => {
         const after = await api.get('SUBMITTER', `/submissions/${studyId()}`)
         expect(after.status_type_id).toBe('SUB')
     })
+    // Deleting a resource only sets its status to DEL. A change of status of the study (submission, approval, publication, rejection)
+    // used to be written to every part of the study, the deleted ones included: the deleted sample came back and was published.
+    test('4.4 the sample deleted in 3.4 is still deleted after the submission', async () => {
+        const samples = await study('samples')
+        expect(samples.find(isExtraSample), 'the deleted sample is back in the study').toBeUndefined()
+        expect(samples).toHaveLength(bundle().counts.samples - 1)
+    })
 })
 
 test.describe('Phase 5: approval and publication', () => {
@@ -354,6 +361,11 @@ test.describe('Phase 5: approval and publication', () => {
     test('5.5 the study is published too', async () => {
         const after = await api.get('SUBMITTER', `/submissions/${studyId()}`)
         expect(after.status_type_id).toBe('PUB')
+    })
+    test('5.6 the sample deleted in 3.4 is still deleted after the publication', async () => {
+        const samples = await study('samples')
+        expect(samples.find(isExtraSample), 'the deleted sample was published').toBeUndefined()
+        expect(samples).toHaveLength(bundle().counts.samples - 1)
     })
 })
 
@@ -533,4 +545,55 @@ test.describe('Phase 7: access request and the DAC decision', () => {
     })
 
     test.fixme('7.9 download the dataset (needs RabbitMQ and the DOA: not part of the demonstrator)', async () => {})
+})
+
+test.describe('Phase 8: a deleted part stays deleted', () => {
+    // A second study whose second dataset is deleted before the submission. The study used to follow all its datasets, the deleted one
+    // included, so it was stuck at "approved" when the other dataset was published.
+    test('8.1 a study with a deleted dataset is approved and published with its other dataset', async () => {
+        test.setTimeout(cfg().approvalTimeoutMs + 120_000)
+        const b = await generateBundle()
+        dropFiles(b, cfg().accounts.SUBMITTER.email)
+        await cron('cron_sda')
+        const up = await api.raw('SUBMITTER', 'POST', '/submissions/upload-study', {
+            multipart: { file1: { name: path.basename(b.zip), mimeType: 'application/zip', buffer: fs.readFileSync(b.zip) }, nb_files: '1' },
+            timeoutMs: 5 * 60_000
+        })
+        expect(parseNdjson(up.text).pop()?.data?.success, up.text.slice(-300)).toBe(true)
+        const found = asList(await api.get('SUBMITTER', '/submissions')).find((s) => String(s.title ?? s.properties?.title).toLowerCase() === b.studyTitle.toLowerCase())
+        const second = publicId(found)
+        const datasets = async () => asList(await api.get('SUBMITTER', `/submissions/${second}/datasets`))
+        const studyStatus = async () => (await api.get('SUBMITTER', `/submissions/${second}`)).status_type_id
+
+        const [first, deleted] = await datasets()
+        await api.del('SUBMITTER', `/submissions/${second}/datasets/${publicId(deleted)}`)
+        expect(await datasets(), 'the deleted dataset is gone from the list').toHaveLength(1)
+
+        const dacs = await api.get('SUBMITTER', '/dacs')
+        const policy = findDeep(dacs, (o) => o.title === cfg().policyTitle && (o.id || o.public_id))
+        await api.put('SUBMITTER', `/submissions/${second}/datasets/${publicId(first)}`, {
+            properties: { ...first.properties, policy_id: policy.id ?? policy.public_id },
+            dataset_type: 'Dataset'
+        })
+        const check = await api.get('SUBMITTER', `/submissions/${second}/check`)
+        expect(check.success, JSON.stringify(check.errors)).toBe(true)
+        await api.patch('SUBMITTER', `/submissions/${second}`, { status_type_id: 'SUB' })
+
+        await poll(
+            'the live dataset and the study approved',
+            async () => {
+                await cron('cron_approve')
+                const [d] = await datasets()
+                const status = await studyStatus()
+                return d.status_type_id === 'APR' && status === 'APR' ? { done: true as const, value: status } : { done: false as const, note: `dataset ${d.status_type_id}, study ${status}` }
+            },
+            { timeoutMs: cfg().approvalTimeoutMs, intervalMs: cfg().pollIntervalMs }
+        )
+        expect(await datasets(), 'the deleted dataset stayed deleted').toHaveLength(1)
+
+        await api.patch('HELPDESK', `/submissions/${second}/datasets/${first.id}`, { status_type_id: 'PUB' })
+        expect((await datasets())[0].status_type_id).toBe('PUB')
+        expect(await studyStatus(), 'the study follows its live datasets').toBe('PUB')
+        expect(await datasets(), 'the deleted dataset was published').toHaveLength(1)
+    })
 })
