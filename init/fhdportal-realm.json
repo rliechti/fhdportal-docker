@@ -805,6 +805,22 @@
         "offline_access",
         "organization",
         "microprofile-jwt"
+      ],
+      "protocolMappers": [
+        {
+          "id": "6775ccb8-3e87-4662-af61-efed625be3e8",
+          "name": "fhdportal-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "fhdportal-cli",
+            "id.token.claim": "false",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
       ]
     },
     {
@@ -884,6 +900,20 @@
             "access.token.claim": "true",
             "claim.name": "ssh-public-key",
             "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "27e0a71c-ec0d-48a1-9276-95fbe1761d83",
+          "name": "fhdportal-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "fhdportal-cli",
+            "id.token.claim": "false",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
           }
         }
       ],
