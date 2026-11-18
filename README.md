@@ -127,9 +127,11 @@ While ideally, the access request is managed by a Data Access Committee portal, 
 26. Click on **Request Access...** 
     ![figure13](assets/figure13.png)
 
-27. Fill in the form. Provide a C4GH public key. It will be stored in the Keycloak account of the user. Click on **Send Request**
+27. Fill in the form. Provide a C4GH public key. It will be stored in the Keycloak account of the user, not in this form. Click on **Send Request**
     ![figure14](assets/figure14.png)
 28. An email in sent to a DAC email address. Navigate to http://localhost:8025
     ![image-20260304142512066](assets/figure15.png)
-29. As administrator of FHDportal, click on **ADMIN -> Dataset Requests** at the bottom of the left navigation menu. All requests are listed and can be **approved** or **rejected**. 
+29. As administrator of FHDportal, click on **ADMIN -> Dataset Requests** at the bottom of the left navigation menu. All requests are listed here, showing their current status.
+
+    *(Note: request approval/rejection is no longer performed from this admin page. In production, the real DAC portal reviews and approves/rejects requests itself, by calling back into FHDportal with its own service credential. This demonstrator's `dac-api` container is a stateless mock of that external DAC portal — it returns canned sample responses so the submission/request-creation flow can be exercised end-to-end, but it does not call back to approve anything, so requests here will stay in a "submitted" state rather than transitioning to "approved". To try that endpoint directly, obtain a token for the `dac-cli` Keycloak client via a client-credentials grant and call `PATCH /api/requests/{id}` with `{"request_status": "APR"}`.)*
     ![image-20260304142826680](assets/figure16.png)

@@ -121,6 +121,15 @@
         "clientRole": false,
         "containerId": "affa354d-4aea-45c6-8030-45351095c8ab",
         "attributes": {}
+      },
+      {
+        "id": "6fd00cb4-ee80-430b-8643-c0a2fee8cb06",
+        "name": "dac-cli",
+        "description": "External DAC portal service credential (client-credentials caller for dataset access request approval)",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "affa354d-4aea-45c6-8030-45351095c8ab",
+        "attributes": {}
       }
     ],
     "client": {
@@ -519,6 +528,31 @@
       },
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "id": "8d755d14-35f1-4d1f-9a39-df6717fe9e5e",
+      "username": "service-account-dac-cli",
+      "emailVerified": false,
+      "enabled": true,
+      "createdTimestamp": 1787929668797,
+      "totp": false,
+      "serviceAccountClientId": "dac-cli",
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-fhdportal",
+        "dac-cli"
+      ],
+      "clientRoles": {
+        "realm-management": [
+          "query-users",
+          "manage-users",
+          "view-users",
+          "query-groups"
+        ]
+      },
+      "notBefore": 0,
+      "groups": []
     }
   ],
   "scopeMappings": [
@@ -857,7 +891,7 @@
         "backchannel.logout.session.required": "true",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:5173/",
+        "post.logout.redirect.uris": "+",
         "display.on.consent.screen": "false",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -930,7 +964,25 @@
         "phone",
         "offline_access",
         "organization",
-        "microprofile-jwt"
+        "microprofile-jwt",
+        "dac:read",
+        "dac:write",
+        "policy:read",
+        "policy:write",
+        "submission:read",
+        "submission:write",
+        "membership:read",
+        "membership:write",
+        "dataset:read",
+        "dac-portal-audience",
+        "datarequest:read",
+        "datarequest:write",
+        "attachment:read",
+        "attachment:write",
+        "consent:read",
+        "consent:write",
+        "contract:read",
+        "contract:write"
       ]
     },
     {
@@ -1031,6 +1083,80 @@
       ],
       "defaultClientScopes": [
         "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "organization",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "b7b8e5ae-efcc-4ae4-9e37-209a0909bb70",
+      "clientId": "dac-cli",
+      "name": "dac-cli",
+      "description": "Keycloak admin-API + DAC-portal service credential (client-credentials grant)",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "oCxOwyIWWv8KUGjiZX4ForecFiO5YG6w",
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "client.secret.creation.time": "1787929668",
+        "request.object.signature.alg": "any",
+        "request.object.encryption.alg": "any",
+        "client.introspection.response.allow.jwt.claim.enabled": "false",
+        "standard.token.exchange.enabled": "false",
+        "frontchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "use.refresh.tokens": "true",
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "client.use.lightweight.access.token.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "request.object.required": "not required",
+        "client_credentials.use_refresh_token": "false",
+        "access.token.header.type.rfc9068": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "require.pushed.authorization.requests": "false",
+        "acr.loa.map": "{}",
+        "display.on.consent.screen": "false",
+        "request.object.encryption.enc": "any",
+        "token.response.type.bearer.lower-case": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "service_account",
         "acr",
         "roles",
         "profile",
@@ -1731,6 +1857,218 @@
           }
         }
       ]
+    },
+    {
+      "id": "ef43e65c-41a5-466c-9563-fe31b7bfd15d",
+      "name": "dac:read",
+      "description": "Custom FEGA/DAC scope: dac:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "0d5782d3-3b14-4d6a-83e2-a692b73a9a13",
+      "name": "dac:write",
+      "description": "Custom FEGA/DAC scope: dac:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "a438ea58-89ab-4f2b-807e-5234231c110a",
+      "name": "policy:read",
+      "description": "Custom FEGA/DAC scope: policy:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "8242ebe3-2717-4876-b250-1af83a215be0",
+      "name": "policy:write",
+      "description": "Custom FEGA/DAC scope: policy:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "92a611f9-eb5d-4442-aecd-3cc08defdb42",
+      "name": "submission:read",
+      "description": "Custom FEGA/DAC scope: submission:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "dbcce564-d0d1-4ed5-a882-5cc362451311",
+      "name": "submission:write",
+      "description": "Custom FEGA/DAC scope: submission:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "4408483e-d95d-4ae1-9f62-62142cd9d374",
+      "name": "membership:read",
+      "description": "Custom FEGA/DAC scope: membership:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "a0bf74c9-c0c9-4d4e-8324-2e883f6c5703",
+      "name": "membership:write",
+      "description": "Custom FEGA/DAC scope: membership:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "3cbf72d6-771f-4209-89cb-9ed64048bb8a",
+      "name": "dataset:read",
+      "description": "Custom FEGA/DAC scope: dataset:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "79fffe47-2640-427d-9931-c45c2b324e65",
+      "name": "dac-portal-audience",
+      "description": "Custom FEGA/DAC scope: dac-portal-audience",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      },
+      "protocolMappers": [
+        {
+          "id": "dceed90f-c004-40ef-8a7d-2c5f8bb758eb",
+          "name": "audience-fhdportal-cli",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "fhdportal-cli",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "id": "db69d10f-de6b-4de7-860e-c24eca16c675",
+      "name": "datarequest:read",
+      "description": "Custom FEGA/DAC scope: datarequest:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "5f03fb28-e606-4ae7-bc5e-3b3c2b0b07ea",
+      "name": "datarequest:write",
+      "description": "Custom FEGA/DAC scope: datarequest:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "bb81ffba-354b-4bf9-b242-3331fe8b8cc0",
+      "name": "attachment:read",
+      "description": "Custom FEGA/DAC scope: attachment:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "c1671f28-ede8-4ebd-9f3a-ef4ccf264d3a",
+      "name": "attachment:write",
+      "description": "Custom FEGA/DAC scope: attachment:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "f9d75065-9e93-40e5-998d-2c3971cfcf48",
+      "name": "consent:read",
+      "description": "Custom FEGA/DAC scope: consent:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "f3aef06e-a6a4-4f72-b585-462bc241b01d",
+      "name": "consent:write",
+      "description": "Custom FEGA/DAC scope: consent:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "be1eeb6c-741f-448d-87fd-f135a51906fb",
+      "name": "contract:read",
+      "description": "Custom FEGA/DAC scope: contract:read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
+    },
+    {
+      "id": "93882294-078d-4799-b625-4d600a5984ad",
+      "name": "contract:write",
+      "description": "Custom FEGA/DAC scope: contract:write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false",
+        "consent.screen.text": ""
+      }
     }
   ],
   "defaultDefaultClientScopes": [

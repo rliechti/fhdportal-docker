@@ -7,6 +7,8 @@ services:
       args:
         - VITE_APP_URL=${VITE_APP_URL}
         - VITE_API_URL=${VITE_API_URL}
+        - VITE_API_ORIGIN=${VITE_API_ORIGIN}
+        - VITE_ENVIRONMENT=${VITE_ENVIRONMENT}
         - VITE_KEYCLOAK_REALM=${KEYCLOAK_REALM}
         - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
         - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
@@ -101,9 +103,6 @@ services:
     build:
         context: .
         dockerfile: Dockerfile.dacapi
-    volumes:
-      - ./dac-data/db.json:/app/db.json
-      - ./dac-data/public:/public:delegated
     ports:
       - 3000:3000
     networks:
