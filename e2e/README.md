@@ -39,22 +39,24 @@ Every run leaves a study and its published datasets in the demonstrator, named `
 | 6 Catalogue and Beacon | dataset in the catalogue, its page lists its files, Beacon (skipped when the image has none) | |
 | 7 Access request | opens a request, sends the form, downloads and uploads the DAA, **the DAC approves, then revokes** | the mock DAC portal never decides: the test sends the decision with the token of the `dac-cli` client, as the real DAC portal does |
 
-Step 7.4 also checks that neither the submitter nor the help desk can decide a request. Not covered: the dataset download (needs
+Steps 3.6 and 7.2b check that a study and an access request belong to their owner, and 7.4 that neither the submitter nor the help desk can decide a request. Not covered: the dataset download (needs
 RabbitMQ and the DOA), what the pages look like, and the DAC portal itself.
 
-## Known bugs, kept visible
+## Bugs found by this test, and the known-bug mechanism
 
-The test found real bugs of the API. Each one is a step marked `test.fail()` (3.7 to 3.10, 7.2): it must fail, which keeps the run
-green, and the report lists it under "Known bugs". When the bug is fixed the step passes, Playwright reports that as a failure,
-and the run stays red until the mark is removed. The two bugs that would block the scenario have a workaround:
+The first runs found five bugs of the API. They are fixed in `fhdportal-api`, and each has a step of its own that now guards the fix:
 
-| Step | Bug | Where | Workaround in the scenario |
-|---|---|---|---|
-| 3.7 | two edits of a study within one second are appended to one `upload_<YmdHis>.json` and the second is refused ("Unsupported file format") | `ResourceEditService::editResource` | the scenario leaves a second between its edits (`edit()` in the spec) |
-| 3.10 | deleting a resource keeps its relationship active and the health check reports it as a blocking `deleted_but_linked` error: a study with a deleted sample can no longer be submitted | `SubmissionHealthCheckService::checkDeletedButLinked` | the deletion is tried on a scratch study (3.4) |
-| 3.8 | an anonymous request for a study is answered with 500, not 401 | `ResourceReadService::getResource` | none needed |
-| 3.9 | a user without a role gets 200 with `{"error":{"status":401}}` (no study data) | same | none needed |
-| 7.2 | the owner of a new access request gets 403 on `GET /dacs/requests/{id}/form` and on the `PATCH`: the ownership row is created by the `PATCH` | `DatasetRequestService::isOwnedByCaller` | step 7.2b sends the form as the help desk account (administrators skip the check), so the request then belongs to that account |
+| Step | The bug | The fix |
+|---|---|---|
+| 3.7 | two edits of a study within one second were appended to the same `upload_<YmdHis>.json`, and the second was refused ("Unsupported file format") | one file per edit, with a random suffix (`ResourceEditService::editResource`) |
+| 3.8 | an anonymous request for a study was answered with 500 | the exception listener gives a plain `Exception` with a 4xx code its status |
+| 3.9 | a user without a role got 200 with `{"error":{"status":401}}` instead of an error status | `getSubmission` answers with the status of the error, as its sibling routes do |
+| 3.10 | deleting a sample made the health check report a blocking `deleted_but_linked` error: such a study could not be submitted | only a rejected resource is reported; a deleted one is soft-deleted and ignored, and a live reference to it is caught by the cross-reference check |
+| 7.2, 7.2b | the owner of a new access request got 403 on the form `GET` and on the `PATCH`: the portal only knows a request after that first `PATCH`, but checked ownership before | a request the portal does not know yet may be opened; once it is known only its owner (or an administrator) passes, which 7.2b checks |
+
+For a bug that cannot be fixed at once, mark its step `test.fail(true, '<what is wrong>')`, and add a workaround to the scenario if it
+blocks the steps after it. The step must then fail, which keeps the run green, and the report lists it under "Known bugs". When the
+bug is fixed the step passes, Playwright reports that as a failure, and the run stays red until the mark (and the workaround) is removed.
 
 ## What the test needs from the demonstrator
 
@@ -66,6 +68,8 @@ and the run stays red until the mark is removed. The two bugs that would block t
 
 ## Notes
 
+- Run against an image that has the fixes of `fhdportal-api` listed above (the demonstrator builds the API from its default branch on GitHub):
+  steps 3.7 to 3.10 and 7.2 fail on an older one.
 - The test creates three accounts (`e2e-submitter`, `e2e-helpdesk`, `e2e-outsider`) in the realm, using the Keycloak admin account
   of `../.env`. `E2E_MANAGE_ACCOUNTS=0` uses existing accounts instead.
 - The data files are random bytes, named as in the bundle: the fake SDA only checks name, size and sha256. They stay in `../sda-inbox`.
