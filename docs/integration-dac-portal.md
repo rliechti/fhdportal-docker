@@ -35,7 +35,7 @@ sequenceDiagram
     S->>F: PATCH study {status_type_id: SUB}
     D->>K: client credentials (dac-cli)
     D->>F: PATCH /api/submissions/{study}/datasets/{dataset} {policy_status: valid}
-    Note over F: dataset and study become approved (APR); the help desk publishes (PUB)
+    Note over F: dataset and study become approved (APR), then the help desk publishes (PUB)
 
     Note over R,D: B. Access request
     R->>F: POST /api/dacs/requests {datasetIDs}
