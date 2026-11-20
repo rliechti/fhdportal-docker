@@ -149,6 +149,12 @@ curl -sk -X POST "$KC/admin/realms/fhdportal/identity-provider/instances/upstrea
 
 Register `https://<keycloak>/realms/fhdportal/broker/upstream/endpoint` as the redirect URI at the provider.
 
+**The alias matters to the web application.** It starts every login with an identity provider hint
+(`fhdportal-app/src/services/auth.ts`): `switch-fega`, or `saml` when the Keycloak address contains `biomedit.ch`. A provider whose
+alias is `switch-fega` therefore receives the user at once, without the Keycloak login page. With another alias, the hint finds
+nothing and the user chooses the provider on the Keycloak page (which is what happens in the demonstrator, where there is no
+provider at all). Name the alias `switch-fega` if you want the direct redirect.
+
 ### 4.2 Checklist for a federated setup
 
 - [ ] **`preferred_username` is stable** and unique per person: derive it from an immutable upstream identifier
