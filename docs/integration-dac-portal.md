@@ -303,6 +303,9 @@ curl -sk -X PATCH "http://localhost:5173/api/requests/$REQUEST_ID" \
   -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d '{"request_status":"APR"}'
 ```
+In the demonstrator, `scripts/dac-decision.sh <request id> APR|REJ` does exactly this (token and call), and `scripts/dac-decision.sh --list` shows the
+request ids, which the admin page does not.
+
 The answer is the request as the portal now shows it (identifiers from an e2e run; `request_status` as after `APR`):
 
 ```json

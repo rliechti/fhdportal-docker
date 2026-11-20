@@ -20,5 +20,6 @@ API=$PORTAL_URL/api                           # the portal's API, as seen by the
 ```
 
 [`check-token.sh`](check-token.sh) decodes an access token and compares it with the configuration (iss, aud, azp, claims).
+[`../scripts/dac-decision.sh`](../scripts/dac-decision.sh) plays the DAC for one access request (approve or reject).
 
 The demonstrator itself (what to click, step by step) is in the [README](../README.md).
