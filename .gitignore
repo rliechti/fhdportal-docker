@@ -1,6 +1,10 @@
 
 ### Project ###
 
+# Certificates: made on the first start (service "certs"), or your own. Never committed.
+/certs/*
+!/certs/.gitkeep
+
 # Docker Container Data
 /fhd-db-data/
 /sda-inbox/

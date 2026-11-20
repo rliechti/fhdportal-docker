@@ -37,8 +37,8 @@ docker-compose up --build -d
 [http://localhost:5173](http://localhost:5173)
 
 > **Installing on a server instead of a laptop?** Set the name under which it is reached, and use HTTPS:
-> `scripts/set-public-host.sh fhd-demo.example.org --https`, then `scripts/make-certs.sh` (or your own certificate) and
-> `docker compose up -d --build`. All addresses derive from the `PUBLIC_*` lines at the top of `.env`. See
+> `scripts/set-public-host.sh fhd-demo.example.org --https`, then `docker compose up -d --build` (a self-signed
+> certificate is made on the first start; put your own in `certs/` before it for a trusted one). All addresses derive from the `PUBLIC_*` lines at the top of `.env`. See
 > [docs/install-on-a-server.md](docs/install-on-a-server.md). The other guides in [docs/](docs/README.md) describe the
 > integration of a DAC portal, a secure data archive and an identity provider.
 

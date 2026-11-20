@@ -1,0 +1,6 @@
+# One-shot helper of compose.yml: makes a self-signed certificate for PUBLIC_HOST when certs/ has none (scripts/make-certs.sh).
+FROM alpine:3
+RUN apk add --no-cache bash openssl
+COPY scripts/make-certs.sh /scripts/make-certs.sh
+ENTRYPOINT ["/scripts/make-certs.sh"]
+CMD ["--if-missing"]

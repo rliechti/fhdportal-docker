@@ -23,15 +23,17 @@ services:
     env_file:
       - .env
     depends_on:
-      - api
+      api:
+        condition: service_started
+      certs:
+        condition: service_completed_successfully
     environment:
       # ServerName of the virtual hosts (conf/fhd-portal.conf)
       PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
     volumes:
       - ./logs:/logs
-      # the certificate of the HTTPS port (5174): replace it with one for PUBLIC_HOST, see scripts/make-certs.sh
-      - ./certs/server.crt:/usr/local/apache2/conf/server.crt:ro
-      - ./certs/server.key:/usr/local/apache2/conf/server.key:ro
+      # the certificate of the HTTPS port (5174): certs/server.crt and server.key, made by the service "certs" when missing
+      - ./certs:/usr/local/apache2/certs:ro
     networks:
       - web-db-net
   api:
@@ -57,6 +59,18 @@ services:
       - db
     networks:
       - web-db-net
+  # One-shot: makes a self-signed certificate for PUBLIC_HOST in ./certs when a file is missing (scripts/make-certs.sh). It never
+  # overwrites a certificate that is there: put the files of your own CA in certs/ (docs/install-on-a-server.md).
+  certs:
+    build:
+      context: .
+      dockerfile: Dockerfile.certs
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
+      CERTS_DIR: /certs
+    volumes:
+      - ./certs:/certs
+    restart: "no"
   db:
     build:
       context: .
@@ -75,7 +89,7 @@ services:
       - web-db-net
   keycloak:
     image: quay.io/keycloak/keycloak
-    command: start-dev  --https-certificate-file=/certs/cert.pem --https-certificate-key-file=/certs/key.pem --import-realm
+    command: start-dev  --https-certificate-file=/certs/cert.pem --https-certificate-key-file=/certs/cert-key.pem --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: db
@@ -94,14 +108,16 @@ services:
       PORTAL_URL: ${PORTAL_URL:-http://localhost:5173}
     volumes:
       - ./init/fhdportal-realm.json:/opt/keycloak/data/import/fhdportal-realm.json
-      - ./certs/cert.pem:/certs/cert.pem 
-      - ./certs/cert-key.pem:/certs/key.pem
+      # certs/cert.pem and cert-key.pem, made by the service "certs" when missing
+      - ./certs:/certs:ro
     ports:
       - "${INTERNAL_BIND:-127.0.0.1}:8080:8080"
       - 8443:8443
     depends_on:
       db:
         condition: service_healthy
+      certs:
+        condition: service_completed_successfully
     networks:
       - web-db-net
   mailhog:

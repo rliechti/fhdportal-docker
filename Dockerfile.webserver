@@ -52,9 +52,7 @@ RUN npm run build
 # Build webserver
 FROM httpd
 
-# Copy SSL certificate and key
-COPY ./certs/server.crt /usr/local/apache2/conf/server.crt
-COPY ./certs/server.key /usr/local/apache2/conf/server.key
+# The certificate and key of the HTTPS port are not in the image: certs/ is mounted at /usr/local/apache2/certs (compose.yml)
 
 
 # Enable Apache modules to ensure proper functionality

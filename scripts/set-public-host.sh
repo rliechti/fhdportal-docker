@@ -61,7 +61,8 @@ fi
 echo
 echo "Next:"
 if [ "$scheme" = "https" ]; then
-  echo "  - a certificate for ${host}:   scripts/make-certs.sh      (or put the files of your CA in certs/, see docs/install-on-a-server.md)"
+  echo "  - a certificate for ${host}: a fresh install makes a self-signed one by itself; if certs/ holds one for another name,"
+  echo "    replace it:   scripts/make-certs.sh      (or put the files of your CA in certs/, see docs/install-on-a-server.md)"
 fi
 echo "  - rebuild the web server, which has the addresses built in:   docker compose up -d --build webserver"
 echo "  - restart the rest:                                           docker compose up -d"

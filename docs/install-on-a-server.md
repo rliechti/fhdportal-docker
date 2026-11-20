@@ -50,13 +50,16 @@ Plain HTTP is acceptable only on `localhost`, where the traffic never leaves the
    | `certs/cert.pem`, `certs/cert-key.pem` | Keycloak (port 8443) |
    | `certs/server.crt`, `certs/server.key` | the web server (port 5174) |
 
-   * With a certificate of your institution's CA or Let's Encrypt: copy the files under these names. This is the way for a
-     server that real users will use; browsers trust it without a warning.
-   * Without one: `scripts/make-certs.sh` makes a **self-signed** certificate for `PUBLIC_HOST` (and `localhost`). Every browser
-     warns once per user until the certificate is trusted. A certificate that is already valid for `PUBLIC_HOST` is never
-     overwritten.
+   * **With a certificate of your institution's CA or Let's Encrypt** (the way for a server that real users will use; browsers
+     trust it without a warning): copy the files under these names **before the first start**. They are never overwritten.
+   * **Without one**, on a fresh install, do nothing: `docker compose up` runs the one-shot service `certs`
+     (`scripts/make-certs.sh --if-missing`), which makes a **self-signed** certificate for `PUBLIC_HOST` (and `localhost`) when
+     a file is missing. Every browser warns once per user until the certificate is trusted.
+   * **If `certs/` already holds certificates** (a laptop install that you now give a real name), the first-start step only
+     warns that they are not valid for the new name and keeps them. Replace them with `scripts/make-certs.sh` (self-signed
+     for the new name) or with your own files.
 
-   The files that come with the repository are an *mkcert* certificate for `localhost`. Do not use them on a server.
+   `certs/` is not in git: a clone starts with none.
 
 4. **Start**, which rebuilds the web server because the addresses are compiled into the application:
 
@@ -148,4 +151,4 @@ The demonstrator realm favours convenience. At least: change the Keycloak admini
 (`KEYCLOAK_SECRET`, `KEYCLOAK_DAC_SECRET`, and the realm file), switch registration off if an identity provider supplies the
 accounts, set `sslRequired` to `external`, and read the hardening table in the
 [identity provider guide](integration-identity-provider.md#7-hardening-the-demo-realm-before-production).
-Remember that the committed `certs/` hold a private key that everybody who has the repository has.
+The private key of the certificate is in `certs/` (ignored by git): keep it out of shared backups and repositories.
