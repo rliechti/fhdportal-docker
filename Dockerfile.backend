@@ -4,6 +4,8 @@ FROM php:8.4-fpm
 ## inject all environment vars we'll need
 ARG GITHUB_URL
 ARG API_GITHUB_URL
+# the branch, tag or commit of fhdportal-api to build (API_REF in .env)
+ARG GIT_REF=main
 ARG FEGA_SCHEMA_DIR
 ENV FEGA_SCHEMA_DIR=${FEGA_SCHEMA_DIR:-/var/www/fhd-portal/htdocs/api/data/schemas}
 
@@ -55,9 +57,8 @@ WORKDIR /var/www/fhd-portal/htdocs/api
 # Add fhd-portal source code
 
 # ADD $GITHUB_URL/commits/main /version.json
-RUN curl -sSL $API_GITHUB_URL/commits/main > /version.json
-RUN git clone $GITHUB_URL.git .
-RUN rm -rf .git
+RUN curl -sSL $API_GITHUB_URL/commits/$GIT_REF > /version.json
+RUN git clone $GITHUB_URL.git . && git checkout --quiet "$GIT_REF" && rm -rf .git
 
 # Create a schema store
 RUN mkdir -p /var/www/fhd-portal/htdocs/api/data/schemas

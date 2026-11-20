@@ -14,8 +14,9 @@ services:
         - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
         - VITE_FEGA_COUNTRY_NAME=${VITE_FEGA_COUNTRY_NAME}
         - VITE_FEGA_COUNTRY_ADJECTIVE=${VITE_FEGA_COUNTRY_ADJECTIVE}
-        - GITHUB_URL=https://github.com/rliechti/fhdportal-app
-        - API_GITHUB_URL=https://api.github.com/repos/rliechti/fhdportal-app
+        - GITHUB_URL=https://github.com/${APP_REPO:-rliechti/fhdportal-app}
+        - API_GITHUB_URL=https://api.github.com/repos/${APP_REPO:-rliechti/fhdportal-app}
+        - GIT_REF=${APP_REF:-main}
     restart: unless-stopped
     ports:
       - "5173:80"
@@ -41,8 +42,9 @@ services:
       context: .
       dockerfile: Dockerfile.backend
       args:
-        - GITHUB_URL=https://github.com/rliechti/fhdportal-api
-        - API_GITHUB_URL=https://api.github.com/repos/rliechti/fhdportal-api
+        - GITHUB_URL=https://github.com/${API_REPO:-rliechti/fhdportal-api}
+        - API_GITHUB_URL=https://api.github.com/repos/${API_REPO:-rliechti/fhdportal-api}
+        - GIT_REF=${API_REF:-main}
         - FEGA_SCHEMA_DIR=${FEGA_SCHEMA_DIR:-/var/www/fhd-portal/htdocs/api/data/schemas}
     ports:
       # the ports other than 5173, 5174 and 8443 (the portal and Keycloak) are for this machine only: INTERNAL_BIND in .env

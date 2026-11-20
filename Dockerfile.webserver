@@ -14,6 +14,8 @@ ARG VITE_FEGA_COUNTRY_NAME
 ARG VITE_FEGA_COUNTRY_ADJECTIVE
 ARG GITHUB_URL
 ARG API_GITHUB_URL
+# the branch, tag or commit of fhdportal-app to build (APP_REF in .env)
+ARG GIT_REF=main
 # expose the variable to the finished container
 ENV VITE_APP_URL=$VITE_APP_URL
 ENV VITE_API_URL=$VITE_API_URL
@@ -40,8 +42,8 @@ WORKDIR /app
 
 # Add fhdportal-app source code
 
-RUN curl -sSL $API_GITHUB_URL/commits/main > /version.json
-RUN git clone $GITHUB_URL.git .
+RUN curl -sSL $API_GITHUB_URL/commits/$GIT_REF > /version.json
+RUN git clone $GITHUB_URL.git . && git checkout --quiet "$GIT_REF"
 ## Install project dependencies
 RUN npm install
 
