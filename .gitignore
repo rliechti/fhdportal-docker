@@ -5,6 +5,9 @@
 /certs/*
 !/certs/.gitkeep
 
+# Test bundles made by scripts/make-test-bundle.sh
+/bundles/
+
 # Docker Container Data
 /fhd-db-data/
 /sda-inbox/
