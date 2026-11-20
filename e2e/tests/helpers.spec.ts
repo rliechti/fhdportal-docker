@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { asList, collectTitles, findDeep, parseNdjson } from '../src/api'
 import { dropFiles, listInbox, splitCommand } from '../src/bundle'
-import { cfg, checkedUrl } from '../src/config'
+import { cfg, checkedUrl, composeEnv, expandVariables } from '../src/config'
 import { waitForUploadedFiles } from '../src/files'
 import { poll } from '../src/poll'
 import { buildMarkdown, StepResult } from '../src/report'
@@ -110,11 +110,28 @@ test.describe('configuration', () => {
     test('a stock demonstrator needs no setting: the defaults point at it', () => {
         for (const k of Object.keys(process.env)) if (k.startsWith('E2E_')) delete process.env[k]
         const c = cfg()
-        expect(c.apiUrl).toBe('http://localhost:5173/api')
+        expect(c.apiUrl).toBe(`${composeEnv().PORTAL_URL ?? 'http://localhost:5173'}/api`)
         expect(c.keycloak.tokenUrl).toMatch(/\/realms\/[^/]+\/protocol\/openid-connect\/token$/)
         expect(c.policyTitle).toBe('Standard Data Access Policy')
         expect(c.sdaInbox).toMatch(/sda-inbox$/)
         expect(c.accounts.SUBMITTER.email).toBe('e2e-submitter@example.org')
+    })
+
+    test('the addresses of ../.env are derived from PUBLIC_HOST, as docker compose reads them', () => {
+        const out = expandVariables({
+            PUBLIC_SCHEME: 'https',
+            PUBLIC_HOST: 'fhd-demo.example.org',
+            PORTAL_PORT: '5174',
+            KEYCLOAK_PORT: '8443',
+            PORTAL_URL: '${PUBLIC_SCHEME}://${PUBLIC_HOST}:${PORTAL_PORT}',
+            KEYCLOAK_PUBLIC_URL: '${PUBLIC_SCHEME}://${PUBLIC_HOST}:${KEYCLOAK_PORT}',
+            VITE_APP_URL: '${PORTAL_URL}',
+            LOOP: '${LOOP}'
+        })
+        expect(out.PORTAL_URL).toBe('https://fhd-demo.example.org:5174')
+        expect(out.KEYCLOAK_PUBLIC_URL).toBe('https://fhd-demo.example.org:8443')
+        expect(out.VITE_APP_URL).toBe('https://fhd-demo.example.org:5174')
+        expect(typeof out.LOOP).toBe('string') // a reference to itself ends (after 10 rounds) instead of hanging
     })
 
     test('settings override the defaults, and a trailing slash is dropped', () => {

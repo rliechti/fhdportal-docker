@@ -62,7 +62,7 @@ Claims the portal then uses:
 A decoded user token of the demonstrator (*checked*):
 
 ```json
-{ "iss": "https://0.0.0.0:8443/realms/fhdportal",
+{ "iss": "http://localhost:8080/realms/fhdportal",
   "azp": "fhdportal-cli",
   "aud": ["fhdportal-cli", "account"],
   "sub": "6fe02c7b-9d5e-42ea-92d0-a86b1334a7e6",
@@ -115,7 +115,8 @@ changes through the Admin API or the console.
 provider was removed again)
 
 ```bash
-KC=https://0.0.0.0:8443
+set -a; . ./.env; set +a
+KC=$KEYCLOAK_PUBLIC_URL
 AT=$(curl -sk -X POST $KC/realms/master/protocol/openid-connect/token \
   -d grant_type=password -d client_id=admin-cli -d username=admin -d password=password \
   | python3 -c 'import sys,json; print(json.load(sys.stdin)["access_token"])')
@@ -181,7 +182,7 @@ USER_TOKEN=$(curl -sk -X POST "$KEYCLOAK_ISSUER_URL/realms/$KEYCLOAK_REALM/proto
 curl -sk http://localhost:5173/api/submissions -H "Authorization: Bearer $USER_TOKEN"
 ```
 
-Request the token from `$KEYCLOAK_ISSUER_URL` (here `https://0.0.0.0:8443`): its host becomes the token's `iss`.
+Request the token at `$KEYCLOAK_ISSUER_URL`. Keycloak is pinned to its public address (`KC_HOSTNAME`), so the token's `iss` is that address wherever the request came from.
 
 ### 5.2 A service token
 
@@ -198,7 +199,7 @@ curl -sk -X POST "$KEYCLOAK_ISSUER_URL/realms/$KEYCLOAK_REALM/protocol/openid-co
 docs/check-token.sh "$USER_TOKEN"
 ```
 ```text
-ok   iss equals https://0.0.0.0:8443/realms/fhdportal
+ok   iss equals http://localhost:8080/realms/fhdportal
 ok   aud contains fhdportal-cli
 ok   azp in fhdportal-sp,fhdportal-cli,dac-cli
 ok   sub and preferred_username
@@ -207,15 +208,16 @@ ok   email present (users only)
 roles: ['submitter', 'offline_access', 'uma_authorization', 'default-roles-fhdportal']
 ```
 
-For the same request sent to `https://localhost:8443` instead, the first line becomes
-`FAIL iss equals https://0.0.0.0:8443/realms/fhdportal` (`got iss=https://localhost:8443/…`). The API's answer to that
-token is a plain 401.
+When the issuer is wrong, the first line reads `FAIL iss equals http://localhost:8080/realms/fhdportal` and the last line shows
+what the token carries instead (`got iss=…`). The API's answer to such a token is a plain 401. This happens when Keycloak is
+not pinned to its public address (an installation that predates `KC_HOSTNAME`, or a proxy that does not forward the host), and the
+token was requested at another address than `KEYCLOAK_ISSUER_URL`.
 
 ### 5.4 Troubleshooting 401
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| 401 on every call, token looks fine | `iss` differs from `KEYCLOAK_ISSUER_URL`: the token was requested at another host name (`localhost` for `0.0.0.0`, an internal for a public URL) | request the token at the issuer URL; set `KEYCLOAK_ISSUER_URL` to the **public** URL |
+| 401 on every call, token looks fine | `iss` differs from `KEYCLOAK_ISSUER_URL` (check it with `docs/check-token.sh`): Keycloak is not pinned to its public address and the token was requested at another host name | request the token at the issuer URL; set `KEYCLOAK_ISSUER_URL` to the **public** URL |
 | 401, `aud` has no `fhdportal-cli` | audience mapper missing on that client | add `fhdportal-api-audience` to the client |
 | 401, `azp` not listed | a new client | add it to `KEYCLOAK_ALLOWED_AZP` |
 | 401 on the DAC calls only | `dac-cli` role missing, or `azp` is not `KEYCLOAK_DAC_CLIENT_ID` | role on the service account; use the `dac-cli` client |
@@ -264,10 +266,10 @@ The demonstrator realm favours convenience. Change at least:
 | `start-dev` | `start`, with the hostname and proxy settings (`KC_HOSTNAME`) |
 | `fhdportal-cli` redirect URIs `/*`, web origins `/*` | the exact URLs |
 | token lifespan 300 s | keep short; align the refresh settings with the SPA |
-| `KEYCLOAK_ISSUER_URL=https://0.0.0.0:8443` | the **public** URL of the realm; `KEYCLOAK_URL` stays the internal address |
+| `PUBLIC_HOST=localhost`, `PUBLIC_SCHEME=http` (they give `KEYCLOAK_ISSUER_URL`) | the real name and `https`; `KEYCLOAK_URL` stays the internal address (see [installing on a server](install-on-a-server.md)) |
 
 Deployments where the browser-facing URL differs from the in-cluster one (the normal Kubernetes case) must set
-`KEYCLOAK_ISSUER_URL` to the public one; see `k8s_template/`.
+`KEYCLOAK_ISSUER_URL` to the public one and pin Keycloak to it (`KC_HOSTNAME`); the compose files do both from `PUBLIC_HOST`.
 
 ## 8. Test recipe
 

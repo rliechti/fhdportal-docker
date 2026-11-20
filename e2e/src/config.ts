@@ -4,7 +4,7 @@ import path from 'node:path'
 
 export type Role = 'SUBMITTER' | 'HELPDESK' | 'OUTSIDER' | 'DAC'
 
-// The demonstrator serves a self-signed certificate for Keycloak (port 8443): the test accepts it when asked to.
+// A demonstrator installed with HTTPS (PUBLIC_SCHEME=https) may serve a self-signed certificate: the test accepts it when asked to.
 if (process.env.E2E_INSECURE_TLS === '1') process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const get = (name: string): string | undefined => {
@@ -48,9 +48,16 @@ export const e2eDir = path.resolve(__dirname, '..')
 
 // The configuration of the demonstrator itself (../.env, the file docker compose reads) gives the defaults, so that
 // the test needs no setting of its own on a stock demonstrator. Parsed only: nothing is put into process.env.
+// Values may refer to others, as docker compose reads them: PORTAL_URL="${PUBLIC_SCHEME}://${PUBLIC_HOST}:${PORTAL_PORT}".
+export function expandVariables(values: Record<string, string>): Record<string, string> {
+    const resolve = (value: string, depth: number): string =>
+        depth > 10 ? value : value.replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (_, name: string) => resolve(values[name] ?? process.env[name] ?? '', depth + 1))
+    return Object.fromEntries(Object.entries(values).map(([name, value]) => [name, resolve(value, 0)]))
+}
+
 export function composeEnv(): Record<string, string> {
     try {
-        return dotenv.parse(fs.readFileSync(path.join(e2eDir, '..', '.env')))
+        return expandVariables(dotenv.parse(fs.readFileSync(path.join(e2eDir, '..', '.env'))))
     } catch {
         return {}
     }
@@ -60,11 +67,11 @@ export function composeEnv(): Record<string, string> {
 export function cfg() {
     const compose = composeEnv()
     const pick = (name: string, composeName: string, fallback?: string): string | undefined => get(name) ?? compose[composeName] ?? fallback
-    const keycloakUrl = (pick('E2E_KEYCLOAK_URL', 'VITE_KEYCLOAK_URL', 'https://0.0.0.0:8443') as string).replace(/\/+$/, '')
+    const keycloakUrl = (get('E2E_KEYCLOAK_URL') ?? compose.KEYCLOAK_PUBLIC_URL ?? compose.VITE_KEYCLOAK_URL ?? 'http://localhost:8080').replace(/\/+$/, '')
     const realm = pick('E2E_KEYCLOAK_REALM', 'KEYCLOAK_REALM', 'fhdportal') as string
     const accountName = (role: 'SUBMITTER' | 'HELPDESK' | 'OUTSIDER', fallback: string) => get(`E2E_${role}_USERNAME`) ?? fallback
     return {
-        apiUrl: checkedUrl('E2E_API_URL', get('E2E_API_URL') ?? 'http://localhost:5173/api').replace(/\/+$/, ''),
+        apiUrl: checkedUrl('E2E_API_URL', get('E2E_API_URL') ?? `${(compose.PORTAL_URL ?? 'http://localhost:5173').replace(/\/+$/, '')}/api`).replace(/\/+$/, ''),
         keycloak: {
             url: checkedUrl('E2E_KEYCLOAK_URL', keycloakUrl),
             realm,

@@ -11,7 +11,7 @@ export default defineConfig({
     fullyParallel: false,
     retries: 0,
     timeout: 120_000,
-    // The demonstrator serves a self-signed certificate (Keycloak, port 8443)
+    // A demonstrator installed with HTTPS may serve a self-signed certificate
     use: { ignoreHTTPSErrors: process.env.E2E_INSECURE_TLS === '1' },
     reporter: [
         ['list'],

@@ -898,18 +898,18 @@
       "clientId": "fhdportal-sp",
       "name": "FHDPortal-SP",
       "description": "Service Provider for FHD Portal",
-      "rootUrl": "http://localhost:5173",
-      "adminUrl": "http://localhost:5173",
-      "baseUrl": "http://localhost:5173",
+      "rootUrl": "${PORTAL_URL}",
+      "adminUrl": "${PORTAL_URL}",
+      "baseUrl": "${PORTAL_URL}",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://localhost:5173/*"
+        "${PORTAL_URL}/*"
       ],
       "webOrigins": [
-        "http://localhost:5173"
+        "${PORTAL_URL}"
       ],
       "notBefore": 0,
       "bearerOnly": false,

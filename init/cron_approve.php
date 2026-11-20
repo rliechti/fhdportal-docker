@@ -11,9 +11,9 @@
 // It runs every minute (init/sdacron) and approves what is submitted (SUB) or re-submitted (RES), whatever its release date. The
 // only thing it reads from the database is that list: a real DAC portal keeps it itself, from POST /submissions.
 //
-// Configuration, all from .env: KEYCLOAK_DAC_CLIENT_ID and KEYCLOAK_DAC_SECRET (the dac-cli client), KEYCLOAK_ISSUER_URL and
-// KEYCLOAK_REALM (the token must carry the issuer that the API expects), KEYCLOAK_URL (where Keycloak is reached from this container).
-// FHDPORTAL_API_INTERNAL_URL (default http://webserver/api) is the API as seen from this container.
+// Configuration, all from .env: KEYCLOAK_DAC_CLIENT_ID and KEYCLOAK_DAC_SECRET (the dac-cli client), KEYCLOAK_REALM and KEYCLOAK_URL
+// (where Keycloak is reached from this container). FHDPORTAL_API_INTERNAL_URL (default http://webserver/api) is the API as seen
+// from this container.
 require __DIR__ . '/include.php';
 
 const APPROVED = 'APR';
@@ -30,19 +30,18 @@ function fail(string $message): never
     exit(1);
 }
 
-// Token of the dac-cli client (client credentials). The issuer of the token is the host that the request names, and the API only
-// accepts KEYCLOAK_ISSUER_URL: the request is sent to that URL, and curl is told where it really is (connect-to). The certificate of
-// the demonstrator is self-signed and issued for another name, so it is not verified here.
+// Token of the dac-cli client (client credentials), asked of Keycloak at its address inside the network (KEYCLOAK_URL). Keycloak is
+// pinned to its public address (KC_HOSTNAME in compose.yml), so the token carries the issuer that the API expects whichever address
+// the request used.
 function dacToken(): string
 {
-    $issuer = rtrim(env('KEYCLOAK_ISSUER_URL') ?? fail('KEYCLOAK_ISSUER_URL is not set'), '/');
     $realm = env('KEYCLOAK_REALM') ?? fail('KEYCLOAK_REALM is not set');
-    $parts = parse_url($issuer);
-    $port = $parts['port'] ?? (($parts['scheme'] ?? 'https') === 'https' ? 443 : 80);
-    $internal = preg_replace('~^https?://~', '', rtrim(env('KEYCLOAK_URL', 'keycloak:8080'), '/'));
-    $internalHost = explode(':', $internal)[0];
+    $keycloak = rtrim(env('KEYCLOAK_URL', 'keycloak:8080'), '/');
+    if (!preg_match('~^https?://~', $keycloak)) {
+        $keycloak = "http://$keycloak";
+    }
 
-    $ch = curl_init("$issuer/realms/$realm/protocol/openid-connect/token");
+    $ch = curl_init("$keycloak/realms/$realm/protocol/openid-connect/token");
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT        => 15,
@@ -51,9 +50,6 @@ function dacToken(): string
             'client_id'     => env('KEYCLOAK_DAC_CLIENT_ID', 'dac-cli'),
             'client_secret' => env('KEYCLOAK_DAC_SECRET') ?? fail('KEYCLOAK_DAC_SECRET is not set'),
         ]),
-        CURLOPT_CONNECT_TO     => ["{$parts['host']}:$port:$internalHost:$port"],
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => 0,
     ]);
     $body = curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);

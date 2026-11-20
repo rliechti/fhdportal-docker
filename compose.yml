@@ -24,8 +24,14 @@ services:
       - .env
     depends_on:
       - api
+    environment:
+      # ServerName of the virtual hosts (conf/fhd-portal.conf)
+      PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
     volumes:
       - ./logs:/logs
+      # the certificate of the HTTPS port (5174): replace it with one for PUBLIC_HOST, see scripts/make-certs.sh
+      - ./certs/server.crt:/usr/local/apache2/conf/server.crt:ro
+      - ./certs/server.key:/usr/local/apache2/conf/server.key:ro
     networks:
       - web-db-net
   api:
@@ -37,7 +43,8 @@ services:
         - API_GITHUB_URL=https://api.github.com/repos/rliechti/fhdportal-api
         - FEGA_SCHEMA_DIR=${FEGA_SCHEMA_DIR:-/var/www/fhd-portal/htdocs/api/data/schemas}
     ports:
-      - "8082:80"
+      # the ports other than 5173, 5174 and 8443 (the portal and Keycloak) are for this machine only: INTERNAL_BIND in .env
+      - "${INTERNAL_BIND:-127.0.0.1}:8082:80"
     env_file:
       - .env
     volumes:
@@ -55,7 +62,7 @@ services:
       context: .
       dockerfile: Dockerfile.database
     ports:
-      - "5433:5432"
+      - "${INTERNAL_BIND:-127.0.0.1}:5433:5432"
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
     env_file:
@@ -79,12 +86,18 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: password
       KEYCLOAK_IMPORT: /tmp/fhdportal-realm.json
+      # The address of Keycloak as the BROWSER sees it. It is the issuer of every token, whatever address a request used
+      # (a token requested at keycloak:8080 inside the network carries it too). The back-channel endpoints stay dynamic.
+      KC_HOSTNAME: ${KEYCLOAK_PUBLIC_URL:-http://localhost:8080}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      # the address of the portal, for the redirect URIs of the client fhdportal-sp (${PORTAL_URL} in the realm file)
+      PORTAL_URL: ${PORTAL_URL:-http://localhost:5173}
     volumes:
       - ./init/fhdportal-realm.json:/opt/keycloak/data/import/fhdportal-realm.json
       - ./certs/cert.pem:/certs/cert.pem 
       - ./certs/cert-key.pem:/certs/key.pem
     ports:
-      - 8080:8080
+      - "${INTERNAL_BIND:-127.0.0.1}:8080:8080"
       - 8443:8443
     depends_on:
       db:
@@ -95,8 +108,8 @@ services:
       container_name: mailhog
       image: mailhog/mailhog
       ports:
-        - 1025:1025
-        - 8025:8025
+        - "${INTERNAL_BIND:-127.0.0.1}:1025:1025"
+        - "${INTERNAL_BIND:-127.0.0.1}:8025:8025"
       networks:
         - web-db-net
   dac-api:
@@ -104,7 +117,7 @@ services:
         context: .
         dockerfile: Dockerfile.dacapi
     ports:
-      - 3000:3000
+      - "${INTERNAL_BIND:-127.0.0.1}:3000:3000"
     networks:
       - web-db-net
     restart: unless-stopped

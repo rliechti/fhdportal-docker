@@ -13,7 +13,7 @@ report). What differs is in the table below: **the SDA and the DAC are not the r
 cd .. && docker compose up --build -d      # the demonstrator, once
 cd e2e
 npm install
-cp .env.example .env                       # sets E2E_INSECURE_TLS=1, the demonstrator serves a self-signed certificate
+cp .env.example .env                       # E2E_INSECURE_TLS=1 only matters if the demonstrator serves a self-signed HTTPS certificate
 npm run e2e                                # about 15 seconds; npm run unit: the helpers only, no demonstrator needed
 ```
 

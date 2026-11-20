@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import type { FullConfig, FullResult, Reporter, TestCase, TestResult } from '@playwright/test/reporter'
+import { cfg } from './config'
 import { buildMarkdown, StepResult, StepStatus } from './report'
 
 // Writes the test report after every run: <results>/reports/<bundle>/test-report.md plus the evidence files
@@ -71,7 +72,7 @@ export default class MarkdownReporter implements Reporter {
             commit: process.env.E2E_COMMIT ?? this.gitCommit(),
             tester: process.env.E2E_TESTER ?? this.git('config user.name') ?? os.userInfo().username,
             startedAt: this.started.toLocaleString('sv-SE'),
-            target: process.env.E2E_API_URL ?? 'http://localhost:5173/api (default)',
+            target: process.env.E2E_API_URL ?? this.configuredApiUrl(),
             bundle,
             htmlReport: path.relative(dir, path.join(this.resultsDir, 'html', 'index.html'))
         })
@@ -82,6 +83,14 @@ export default class MarkdownReporter implements Reporter {
 
     printsToStdio() {
         return false
+    }
+
+    private configuredApiUrl(): string {
+        try {
+            return `${cfg().apiUrl} (from ../.env)`
+        } catch {
+            return 'http://localhost:5173/api (default)'
+        }
     }
 
     private readBundle(steps: Array<{ test: TestCase; result: TestResult }>) {

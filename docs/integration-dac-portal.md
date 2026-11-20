@@ -70,7 +70,7 @@ All values live in `../.env` (the file docker compose reads; the API container m
 | `KEYCLOAK_DAC_CLIENT_ID` | `dac-cli` | The `azp` the API requires for a DAC service token. |
 | `KEYCLOAK_DAC_SECRET` | *(in `.env`)* | Secret of that client. Your adapter needs it, FHDportal does not. |
 | `KEYCLOAK_ALLOWED_AZP` | `fhdportal-sp,fhdportal-cli,dac-cli` | Clients whose tokens the API accepts. **Must include `dac-cli`.** |
-| `KEYCLOAK_ISSUER_URL` | `https://0.0.0.0:8443` | Issuer the API expects in `iss`. Your adapter must obtain its token from this URL (see 5.1). |
+| `KEYCLOAK_ISSUER_URL` | `http://localhost:8080` | Issuer the API expects in `iss`: the public address of Keycloak, to which Keycloak itself is pinned (`KC_HOSTNAME`). Derived from `PUBLIC_HOST` ([server installation](install-on-a-server.md)). |
 | `HELPDESK_EMAIL`, `GOS_DAC_EMAIL` | `.env` | Addresses that receive the notification mails (MailHog in the demonstrator). |
 
 In the realm (`init/fhdportal-realm.json`): a confidential client `dac-cli` with *service accounts* enabled, the realm role
@@ -239,7 +239,7 @@ The DAC authenticates with the **client credentials** grant of the `dac-cli` cli
 ```bash
 # from the demonstrator folder; the secret is in .env
 set -a; . ./.env; set +a
-TOKEN=$(curl -sk -X POST "https://0.0.0.0:8443/realms/fhdportal/protocol/openid-connect/token" \
+TOKEN=$(curl -sk -X POST "$KEYCLOAK_ISSUER_URL/realms/$KEYCLOAK_REALM/protocol/openid-connect/token" \
   -d grant_type=client_credentials -d client_id=dac-cli -d client_secret="$KEYCLOAK_DAC_SECRET" \
   | python3 -c 'import sys,json; print(json.load(sys.stdin)["access_token"])')
 ```
@@ -247,7 +247,7 @@ TOKEN=$(curl -sk -X POST "https://0.0.0.0:8443/realms/fhdportal/protocol/openid-
 The decoded token (checked on the demonstrator):
 
 ```json
-{ "iss": "https://0.0.0.0:8443/realms/fhdportal",
+{ "iss": "http://localhost:8080/realms/fhdportal",
   "azp": "dac-cli",
   "aud": ["fhdportal-cli", "realm-management", "account"],
   "preferred_username": "service-account-dac-cli",
@@ -258,9 +258,10 @@ The API accepts it only if **all** of this hold: `iss` equals `KEYCLOAK_ISSUER_U
 `fhdportal-cli`, `azp` is in `KEYCLOAK_ALLOWED_AZP`, and (for the DAC calls) the role `dac-cli` is present **and** `azp`
 equals `KEYCLOAK_DAC_CLIENT_ID`. A token for a human who holds the role is not enough.
 
-> **Gotcha, seen while writing this page.** The same request sent to `https://localhost:8443` returns a valid-looking
-> token whose `iss` is `https://localhost:8443/…`; the API then answers **401 Unauthorized**, with no hint. Fetch the token
-> from the URL that `KEYCLOAK_ISSUER_URL` names (`https://0.0.0.0:8443`; the certificate is self-signed, hence `-k`).
+> **The issuer does not depend on where you ask.** Keycloak is pinned to its public address (`KC_HOSTNAME`), so a token
+> requested at `keycloak:8080` inside the network and one requested at the public name carry the same `iss`. On an older
+> installation without that setting the issuer is the host of the request, and a token requested at another address than
+> `KEYCLOAK_ISSUER_URL` gets a plain **401** from the API, with no hint (`docs/check-token.sh` shows the difference).
 > Tokens live 300 seconds: request a new one for each batch of calls.
 
 ### 5.2 Dataset decision: approve or send back
@@ -396,8 +397,8 @@ Advice:
   dataset that is submitted or re-submitted, so the demonstrator and the end-to-end test exercise the real contract, including
   the study approval and the mail to the help desk. The only thing it reads from the database is the list of submitted
   datasets, which a real DAC keeps itself from `POST /submissions` (the mock does not). It reaches the API at
-  `http://webserver/api` (`FHDPORTAL_API_INTERNAL_URL`) and Keycloak at `KEYCLOAK_ISSUER_URL`, with curl's connect-to to the
-  internal address, because the token's issuer must be the one the API expects.
+  `http://webserver/api` (`FHDPORTAL_API_INTERNAL_URL`) and asks Keycloak for the token at its internal address
+  (`KEYCLOAK_URL`); the issuer is still the one the API expects, because Keycloak is pinned to its public address.
 * A request can be opened only for a dataset that is published (or revised/re-submitted) **and whose release date has
   arrived**, and the requester needs a Crypt4GH key registered (e2e step 0.3). If either is missing, the form `PATCH`
   still answers 200 but FHDportal does **not** register the request: it never appears in `GET /api/requests` and the later
