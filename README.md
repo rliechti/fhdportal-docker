@@ -110,7 +110,7 @@ cp ../../fhdportal-example/RCC/files/*.c4gh .
     *(Note: In FEGA production, a separate DAC portal handles Policies. Here, a fake REST API serves this function.)*
 20. Once policies are set for all datasets, a **Submit Study...** button will appear.
 21. Click it to submit and confirm your study.
-22. Within one minute the submitted datasets (and the study) become **approved**: a cron job plays the DAC portal here. In production the DAC portal approves.
+22. Within one minute the submitted datasets (and the study) become **approved**: a cron job plays the DAC portal here, by making the call a real DAC portal makes (`PATCH /api/submissions/{study}/datasets/{dataset}` with a `dac-cli` token). The help desk receives the usual "approved by DAC" mail in MailHog. In production the DAC portal approves.
 23. Publication is done by an FHDportal administrator (role `admin-fega`, see the first steps). Open **Admin → Dataset Reviews** ("Dataset Publication Review"), click **approve...** on each dataset and then **confirm publication**.
 24. Reload the page; the dataset status should update to **published**.
 

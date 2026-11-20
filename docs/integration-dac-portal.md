@@ -57,8 +57,8 @@ Two properties to build on:
   validates it against the same Keycloak realm, so a user is the same principal on both sides and no identity mapping is
   needed. (The demonstrator mock does not validate tokens; a real DAC must.)
 * **Two inbound calls**, both made with a `dac-cli` service token. MS5.3 mentions one; the dataset-level approval of
-  section 5.2 is the second. In the demonstrator a cron job (`init/cron_approve.php`) plays that second call by writing to
-  the database; see section 8.
+  section 5.2 is the second. In the demonstrator a cron job (`init/cron_approve.php`) plays the DAC and makes exactly that
+  call with a `dac-cli` token; see section 8.
 
 ## 2. Configuration
 
@@ -391,9 +391,13 @@ Advice:
 ## 8. Limits of the demonstrator, and things to know
 
 * The mock in `dac-data/` is **stateless and one-directional**: canned answers, no token validation, and it never decides.
-* `init/cron_approve.php` stands in for the dataset decision of section 5.2: every minute it approves submitted datasets by
-  writing to the database. It does **not** call the API, so the dataset decision is not exercised end to end. Making the
-  cron job call `PATCH …/datasets/…` with a `dac-cli` token would test the real contract.
+* `init/cron_approve.php` stands in for the dataset decision of section 5.2. Every minute it asks Keycloak for a `dac-cli`
+  token (client credentials) and calls `PATCH /api/submissions/{study}/datasets/{dataset}` with `policy_status: valid` for each
+  dataset that is submitted or re-submitted, so the demonstrator and the end-to-end test exercise the real contract, including
+  the study approval and the mail to the help desk. The only thing it reads from the database is the list of submitted
+  datasets, which a real DAC keeps itself from `POST /submissions` (the mock does not). It reaches the API at
+  `http://webserver/api` (`FHDPORTAL_API_INTERNAL_URL`) and Keycloak at `KEYCLOAK_ISSUER_URL`, with curl's connect-to to the
+  internal address, because the token's issuer must be the one the API expects.
 * A request can be opened only for a dataset that is published (or revised/re-submitted) **and whose release date has
   arrived**, and the requester needs a Crypt4GH key registered (e2e step 0.3). If either is missing, the form `PATCH`
   still answers 200 but FHDportal does **not** register the request: it never appears in `GET /api/requests` and the later

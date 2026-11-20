@@ -3,7 +3,8 @@
 //
 // What differs from a production node, and so from the staging test this one comes from:
 //  - the SDA is a folder (sda-inbox/<e-mail>/) read by a cron job of the API container, no SFTP;
-//  - there is no DAC decision on a submission: a cron job publishes what is submitted once its release date has come;
+//  - the mock DAC portal does not decide on a submission: a cron job of the API container plays it and approves what is submitted
+//    (publishing is the help desk's);
 //  - the mock DAC portal only answers, it never decides: the test plays the DAC portal for the access request, with
 //    the token of the "dac-cli" client, which is how the real DAC portal sends its decision.
 import { expect, test } from '@playwright/test'
@@ -311,7 +312,7 @@ test.describe('Phase 5: approval and publication', () => {
     // The review list of the help desk ("Dataset Publication Review"); /datasets is the public catalogue.
     const mine = async () => asList(await api.get('HELPDESK', '/admin/datasets')).filter((d) => d.study_public_id === studyId() || d.study_id === studyId())
 
-    // There is no DAC portal here: a cron job of the API container (init/cron_approve.php) plays it, and approves what is submitted.
+    // There is no DAC portal here: a cron job of the API container (init/cron_approve.php) plays it: it calls the API with a dac-cli token to approve what is submitted.
     // It never publishes: that is up to an administrator of FHDportal (5.4).
     test('5.1 the cron job plays the DAC portal: both datasets and the study are approved', async () => {
         test.setTimeout(cfg().approvalTimeoutMs + 60_000)

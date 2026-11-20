@@ -35,7 +35,7 @@ Every run leaves a study and its published datasets in the demonstrator, named `
 | 2 Uploaded files | the cron job of the API container registers the files, the test waits for them in "My Uploaded Files" | the cron job runs every minute (the test runs it at once) |
 | 3 Bundle upload and editing | uploads the zip, edits the study and a sample, deletes a sample (on a scratch study), reads every resource type, checks that the study is private | |
 | 4 Policy and submission | health check, policy of the mock DAC portal, submit | |
-| 5 Approval and publication | a cron job approves both datasets and the study, the help desk sees them in the review list and publishes them | no DAC portal: a cron job of the API container plays it and approves what is submitted; publishing is the help desk's, as in production |
+| 5 Approval and publication | a cron job approves both datasets and the study, the help desk sees them in the review list and publishes them | no DAC portal: a cron job of the API container plays it and sends the decision to the API with a `dac-cli` token, as the real one does; publishing is the help desk's, as in production |
 | 6 Catalogue and Beacon | dataset in the catalogue, its page lists its files, Beacon (skipped when the image has none) | Beacon caches its model for 5 minutes: the test drops it, or waits for it (up to 6 minutes) without docker |
 | 7 Access request | opens a request, sends the form, downloads and uploads the DAA, **the DAC approves, then revokes** | the mock DAC portal never decides: the test sends the decision with the token of the `dac-cli` client, as the real DAC portal does |
 | 8 A deleted part stays deleted | a second study whose second dataset is deleted is approved and published with its other dataset | |
